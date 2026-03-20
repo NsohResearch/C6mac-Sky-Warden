@@ -43,7 +43,7 @@ const plans: PlanDef[] = [
     prices: { USD: { monthly: 29900, annual: 287000 }, CAD: { monthly: 40400, annual: 387500 }, NGN: { monthly: 4485000, annual: 43050000 }, KES: { monthly: 3885000, annual: 37300000 }, ZAR: { monthly: 538000, annual: 5165000 }, GHS: { monthly: 299000, annual: 2870000 }, RWF: { monthly: 29900000, annual: 287000000 } },
   },
   {
-    id: 'developer', name: 'Developer', description: 'For app developers building on Sky Warden APIs',
+    id: 'developer', name: 'Developer', description: 'For app developers building on SkyWarden APIs',
     cta: 'Start Building', icon: Code2,
     features: ['Full API access', 'Sandbox environment', 'Webhook configuration', '1,000 API calls/hour', 'SDK access (Node.js, Python)', 'API key management', '5 GB storage', 'Community support'],
     prices: { USD: { monthly: 2900, annual: 27800 }, CAD: { monthly: 3900, annual: 37500 }, NGN: { monthly: 435000, annual: 4170000 }, KES: { monthly: 375000, annual: 3600000 }, ZAR: { monthly: 52000, annual: 500000 }, GHS: { monthly: 29000, annual: 278000 }, RWF: { monthly: 2900000, annual: 27800000 } },
@@ -80,7 +80,7 @@ export default function PricingPage() {
     <div className="space-y-8">
       {/* Hero */}
       <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-white">
-        <h1 className="text-3xl font-bold tracking-tight text-balance">Sky Warden Plans</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-balance">SkyWarden Plans</h1>
         <p className="mt-2 text-sm text-slate-300 max-w-2xl">
           Multi-region drone fleet management with built-in compliance, authorization, and Remote ID tracking
         </p>

@@ -15,7 +15,7 @@ export interface BrandPreset {
 export const BRAND_PRESETS: BrandPreset[] = [
   {
     id: 'sky-warden',
-    name: 'Sky Warden (Default)',
+    name: 'SkyWarden (Default)',
     primaryHsl: '220 18% 20%',
     accentHsl: '36 95% 52%',
     backgroundHsl: '40 20% 97%',

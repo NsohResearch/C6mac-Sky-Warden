@@ -41,7 +41,7 @@ export default function LandingPage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-2">
             <Plane className="h-6 w-6 text-accent" />
-            <span className="text-lg font-bold tracking-tight">Sky Warden</span>
+            <span className="text-lg font-bold tracking-tight">SkyWarden</span>
           </div>
           <div className="hidden items-center gap-8 md:flex">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
@@ -262,7 +262,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 active:scale-[0.97] transition-all" onClick={() => navigate('/login')}>
-              Join Sky Warden <ArrowRight className="ml-1 h-4 w-4" />
+              Join SkyWarden <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/pricing')}>
               View Pricing
