@@ -23,6 +23,11 @@ import { DroneRegistrationPage } from './pages/DroneRegistrationPage';
 import { GovernmentRevenuePage } from './pages/GovernmentRevenuePage';
 import { WhiteLabelPage } from './pages/WhiteLabelPage';
 
+// Onboarding & Flight Plans
+import { OnboardingPage } from './pages/OnboardingPage';
+import { FlightPlanPage } from './pages/FlightPlanPage';
+import { OnboardingGuard } from './components/OnboardingGuard';
+
 // Public marketing pages
 import { LandingPage } from './pages/LandingPage';
 import { IndustriesPage } from './pages/IndustriesPage';
@@ -67,12 +72,24 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
 
+      {/* Onboarding (requires auth, outside dashboard) */}
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute>
+            <OnboardingPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Protected routes */}
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardLayout />
+            <OnboardingGuard>
+              <DashboardLayout />
+            </OnboardingGuard>
           </ProtectedRoute>
         }
       >
@@ -84,6 +101,7 @@ export default function App() {
         <Route path="compliance" element={<CompliancePage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="billing" element={<BillingPage />} />
+        <Route path="flight-plans" element={<FlightPlanPage />} />
         <Route path="registration" element={<DroneRegistrationPage />} />
         <Route path="government-revenue" element={<GovernmentRevenuePage />} />
         <Route path="whitelabel" element={<WhiteLabelPage />} />
