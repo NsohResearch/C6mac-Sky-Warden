@@ -23,6 +23,7 @@ import { billingRoutes } from './routes/billing.routes.js';
 import { registrationRoutes } from './routes/registration.routes.js';
 import { whiteLabelRoutes } from './routes/whitelabel.routes.js';
 import { flightPlanRoutes } from './routes/flightplan.routes.js';
+import { safetyRoutes } from './routes/safety.routes.js';
 
 // ─── App Setup ───
 
@@ -100,6 +101,9 @@ api.route('/whitelabel', whiteLabelRoutes);
 // Flight plan / waypath authorization
 api.route('/flight-plans', flightPlanRoutes);
 
+// Safety reporting (ASRP) & enhanced compliance
+api.route('/safety', safetyRoutes);
+
 // Mount versioned API
 app.route(`/api/${env.API_VERSION}`, api);
 
@@ -125,6 +129,7 @@ app.get('/api', (c) => {
       registrations: `/api/${env.API_VERSION}/registrations`,
       whitelabel: `/api/${env.API_VERSION}/whitelabel`,
       flightPlans: `/api/${env.API_VERSION}/flight-plans`,
+      safety: `/api/${env.API_VERSION}/safety`,
     },
     personas: [
       { name: 'Individual Pilot', description: 'B4UFLY checks, LAANC auth, flight logging, Remote ID compliance' },
@@ -133,7 +138,7 @@ app.get('/api', (c) => {
       { name: 'Developer', description: 'REST APIs, webhooks, SDK, sandbox environment' },
     ],
     compliance: {
-      faa: ['B4UFLY', 'LAANC', 'Part 107', 'Remote ID (14 CFR Part 89)', 'UAS Facility Maps'],
+      faa: ['B4UFLY', 'LAANC', 'Part 107', 'Remote ID (14 CFR Part 89)', 'UAS Facility Maps', 'ASRP (Aviation Safety Reporting)'],
       security: ['SOC 2 Type II', 'ISO 27001:2022'],
     },
   });
