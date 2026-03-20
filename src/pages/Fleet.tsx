@@ -54,8 +54,8 @@ export default function Fleet() {
         serial_number: form.serial_number,
         category: form.category,
         nickname: form.nickname || null,
-        region: profile.region || "US",
-      });
+        region: (profile.region || "US") as any,
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {

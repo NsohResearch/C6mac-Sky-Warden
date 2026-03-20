@@ -50,16 +50,16 @@ export default function Missions() {
   const createMission = useMutation({
     mutationFn: async () => {
       if (!profile?.tenant_id) throw new Error("No tenant");
-      const { error } = await supabase.from("missions").insert({
+      const { error } = await supabase.from("missions").insert([{
         tenant_id: profile.tenant_id,
         title: form.title,
         mission_type: form.mission_type,
         max_altitude_ft: form.max_altitude_ft,
         description: form.description || null,
-        region: profile.region || "US",
+        region: (profile.region || "US") as any,
         pilot_id: profile.id,
         status: "draft",
-      });
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {
