@@ -6,6 +6,10 @@ import {
   Settings, LogOut, Menu, X, ChevronDown, Bell,
   Building2, Code2, Users, FileCheck, AlertTriangle, ShieldAlert,
   ClipboardCheck, CreditCard, Landmark, Palette, Navigation,
+  Activity, Cloud, BookOpen, BellRing, Wrench, MapPin,
+  Umbrella, FileText, FolderOpen, Eye, Briefcase,
+  Radar, Package, Cpu, FileCheck2, GraduationCap,
+  Store, Truck, ShieldOff, Leaf, Globe, WifiOff,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -34,6 +38,40 @@ const navItems: NavItem[] = [
   { label: 'White Label', path: '/dashboard/whitelabel', icon: <Palette size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
   { label: 'Billing', path: '/dashboard/billing', icon: <CreditCard size={20} /> },
   { label: 'Team', path: '/dashboard/settings', icon: <Users size={20} />, personas: ['enterprise_manager'] },
+
+  // ── Operations ──
+  { label: 'Live Telemetry', path: '/dashboard/telemetry', icon: <Activity size={20} /> },
+  { label: 'Weather', path: '/dashboard/weather', icon: <Cloud size={20} /> },
+  { label: 'Pilot Logbook', path: '/dashboard/logbook', icon: <BookOpen size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
+  { label: 'Geofences', path: '/dashboard/geofences', icon: <MapPin size={20} /> },
+  { label: 'Payloads', path: '/dashboard/payloads', icon: <Package size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
+
+  // ── Fleet & Maintenance ──
+  { label: 'Maintenance', path: '/dashboard/maintenance', icon: <Wrench size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
+  { label: 'Insurance', path: '/dashboard/insurance', icon: <Umbrella size={20} /> },
+  { label: 'Documents', path: '/dashboard/documents', icon: <FolderOpen size={20} /> },
+
+  // ── Safety & Incidents ──
+  { label: 'Incidents', path: '/dashboard/incidents', icon: <AlertTriangle size={20} /> },
+
+  // ── Advanced Operations ──
+  { label: 'BVLOS Operations', path: '/dashboard/bvlos', icon: <Eye size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
+  { label: 'UTM Network', path: '/dashboard/utm', icon: <Radar size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
+  { label: 'Drone Delivery', path: '/dashboard/delivery', icon: <Truck size={20} />, personas: ['enterprise_manager'] },
+  { label: 'Data Processing', path: '/dashboard/data-processing', icon: <Cpu size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
+  { label: 'Counter-UAS', path: '/dashboard/counter-uas', icon: <ShieldOff size={20} />, personas: ['agency_representative'] },
+
+  // ── Business ──
+  { label: 'Client Portal', path: '/dashboard/clients', icon: <Briefcase size={20} />, personas: ['enterprise_manager'] },
+  { label: 'Audit & Export', path: '/dashboard/audit-export', icon: <FileCheck2 size={20} /> },
+  { label: 'Training', path: '/dashboard/training', icon: <GraduationCap size={20} /> },
+  { label: 'Marketplace', path: '/dashboard/marketplace', icon: <Store size={20} /> },
+  { label: 'Carbon & ESG', path: '/dashboard/carbon-esg', icon: <Leaf size={20} /> },
+
+  // ── System ──
+  { label: 'Notifications', path: '/dashboard/notifications', icon: <BellRing size={20} /> },
+  { label: 'Localization', path: '/dashboard/localization', icon: <Globe size={20} /> },
+  { label: 'Offline & Field', path: '/dashboard/offline', icon: <WifiOff size={20} /> },
 ];
 
 export function DashboardLayout() {

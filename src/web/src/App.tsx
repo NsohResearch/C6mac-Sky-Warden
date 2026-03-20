@@ -31,6 +31,30 @@ import { OnboardingGuard } from './components/OnboardingGuard';
 // Safety
 import { SafetyReportingPage } from './pages/SafetyReportingPage';
 
+// New feature pages
+import { LiveTelemetryPage } from './pages/LiveTelemetryPage';
+import { WeatherPage } from './pages/WeatherPage';
+import { PilotLogbookPage } from './pages/PilotLogbookPage';
+import { NotificationsPage } from './pages/NotificationsPage';
+import { MaintenancePage } from './pages/MaintenancePage';
+import { GeofencePage } from './pages/GeofencePage';
+import { InsurancePage } from './pages/InsurancePage';
+import { IncidentPage } from './pages/IncidentPage';
+import { DocumentVaultPage } from './pages/DocumentVaultPage';
+import { BVLOSPage } from './pages/BVLOSPage';
+import { ClientPortalPage } from './pages/ClientPortalPage';
+import { UTMPage } from './pages/UTMPage';
+import { PayloadPage } from './pages/PayloadPage';
+import { DataProcessingPage } from './pages/DataProcessingPage';
+import { AuditExportPage } from './pages/AuditExportPage';
+import { TrainingPage } from './pages/TrainingPage';
+import { MarketplacePage } from './pages/MarketplacePage';
+import { DeliveryPage } from './pages/DeliveryPage';
+import { CounterUASPage } from './pages/CounterUASPage';
+import { CarbonESGPage } from './pages/CarbonESGPage';
+import { LocalizationPage } from './pages/LocalizationPage';
+import { OfflineFieldPage } from './pages/OfflineFieldPage';
+
 // Public marketing pages
 import { LandingPage } from './pages/LandingPage';
 import { IndustriesPage } from './pages/IndustriesPage';
@@ -110,6 +134,30 @@ export default function App() {
         <Route path="government-revenue" element={<GovernmentRevenuePage />} />
         <Route path="whitelabel" element={<WhiteLabelPage />} />
         <Route path="settings" element={<SettingsPage />} />
+
+        {/* New feature routes */}
+        <Route path="telemetry" element={<LiveTelemetryPage />} />
+        <Route path="weather" element={<WeatherPage />} />
+        <Route path="logbook" element={<PilotLogbookPage />} />
+        <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="maintenance" element={<MaintenancePage />} />
+        <Route path="geofences" element={<GeofencePage />} />
+        <Route path="insurance" element={<InsurancePage />} />
+        <Route path="incidents" element={<IncidentPage />} />
+        <Route path="documents" element={<DocumentVaultPage />} />
+        <Route path="bvlos" element={<BVLOSPage />} />
+        <Route path="clients" element={<ClientPortalPage />} />
+        <Route path="utm" element={<UTMPage />} />
+        <Route path="payloads" element={<PayloadPage />} />
+        <Route path="data-processing" element={<DataProcessingPage />} />
+        <Route path="audit-export" element={<AuditExportPage />} />
+        <Route path="training" element={<TrainingPage />} />
+        <Route path="marketplace" element={<MarketplacePage />} />
+        <Route path="delivery" element={<DeliveryPage />} />
+        <Route path="counter-uas" element={<CounterUASPage />} />
+        <Route path="carbon-esg" element={<CarbonESGPage />} />
+        <Route path="localization" element={<LocalizationPage />} />
+        <Route path="offline" element={<OfflineFieldPage />} />
 
         {/* Persona-specific sub-routes */}
         <Route path="pilot/*" element={<PilotDashboard />} />
