@@ -2,53 +2,91 @@ import { useState } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import NotificationCenter from "@/components/NotificationCenter";
 import {
-  LayoutDashboard,
-  Map,
-  Plane,
-  Navigation,
-  Shield,
-  BarChart3,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  
-  Search,
-  LogOut,
-  User,
-  Radio,
-  CreditCard,
-  FileText,
-  Landmark,
-  Paintbrush,
-  Route,
-  ShieldAlert,
-  Radar,
-  Satellite,
-  Cloud,
-  BookOpen,
+  LayoutDashboard, Map, Plane, Navigation, Shield, BarChart3, Settings,
+  ChevronLeft, ChevronRight, Search, LogOut, User, Radio, CreditCard,
+  FileText, Landmark, Paintbrush, Route, ShieldAlert, Radar, Satellite,
+  Cloud, BookOpen,
+  // New feature icons
+  BellRing, Wrench, MapPin, Umbrella, AlertTriangle, FolderOpen, Eye,
+  Briefcase, Signal, Package, Cpu, ClipboardList, GraduationCap, Store,
+  Truck, ShieldOff, Leaf, Globe, WifiOff,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Airspace", icon: Map, path: "/airspace" },
-  { label: "Live Telemetry", icon: Satellite, path: "/live-telemetry" },
-  { label: "Fleet", icon: Plane, path: "/fleet" },
-  { label: "Missions", icon: Navigation, path: "/missions" },
-  { label: "Flight Plans", icon: Route, path: "/flight-plans" },
-  { label: "Registration", icon: FileText, path: "/registration" },
-  { label: "LAANC", icon: Shield, path: "/laanc" },
-  { label: "Remote ID", icon: Radio, path: "/remote-id" },
-  { label: "Safety (ASRP)", icon: ShieldAlert, path: "/safety-reports" },
-  { label: "B4UFLY", icon: Radar, path: "/b4ufly" },
-  { label: "Weather", icon: Cloud, path: "/weather" },
-  { label: "Pilot Logbook", icon: BookOpen, path: "/pilot-logbook" },
-  { label: "Billing", icon: CreditCard, path: "/billing" },
-  { label: "Gov Revenue", icon: Landmark, path: "/government-revenue" },
-  { label: "Analytics", icon: BarChart3, path: "/analytics" },
-  { label: "White-Label", icon: Paintbrush, path: "/white-label" },
-  { label: "Settings", icon: Settings, path: "/settings" },
+interface NavSection {
+  title: string;
+  items: { label: string; icon: any; path: string }[];
+}
+
+const navSections: NavSection[] = [
+  {
+    title: "Operations",
+    items: [
+      { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { label: "Airspace", icon: Map, path: "/airspace" },
+      { label: "Live Telemetry", icon: Satellite, path: "/live-telemetry" },
+      { label: "Fleet", icon: Plane, path: "/fleet" },
+      { label: "Missions", icon: Navigation, path: "/missions" },
+      { label: "Flight Plans", icon: Route, path: "/flight-plans" },
+      { label: "Weather", icon: Cloud, path: "/weather" },
+      { label: "Pilot Logbook", icon: BookOpen, path: "/pilot-logbook" },
+    ],
+  },
+  {
+    title: "Compliance & Safety",
+    items: [
+      { label: "Registration", icon: FileText, path: "/registration" },
+      { label: "LAANC", icon: Shield, path: "/laanc" },
+      { label: "Remote ID", icon: Radio, path: "/remote-id" },
+      { label: "Safety (ASRP)", icon: ShieldAlert, path: "/safety-reports" },
+      { label: "B4UFLY", icon: Radar, path: "/b4ufly" },
+      { label: "Geofences", icon: MapPin, path: "/geofences" },
+      { label: "Incidents", icon: AlertTriangle, path: "/incidents" },
+      { label: "BVLOS Ops", icon: Eye, path: "/bvlos" },
+      { label: "Counter-UAS", icon: ShieldOff, path: "/counter-uas" },
+    ],
+  },
+  {
+    title: "Fleet & Maintenance",
+    items: [
+      { label: "Maintenance", icon: Wrench, path: "/maintenance" },
+      { label: "Insurance", icon: Umbrella, path: "/insurance" },
+      { label: "Payloads", icon: Package, path: "/payloads" },
+      { label: "Documents", icon: FolderOpen, path: "/documents" },
+    ],
+  },
+  {
+    title: "Advanced",
+    items: [
+      { label: "UTM Network", icon: Signal, path: "/utm" },
+      { label: "Data Processing", icon: Cpu, path: "/data-processing" },
+      { label: "Drone Delivery", icon: Truck, path: "/delivery" },
+      { label: "Client Portal", icon: Briefcase, path: "/client-portal" },
+    ],
+  },
+  {
+    title: "Business",
+    items: [
+      { label: "Billing", icon: CreditCard, path: "/billing" },
+      { label: "Gov Revenue", icon: Landmark, path: "/government-revenue" },
+      { label: "Analytics", icon: BarChart3, path: "/analytics" },
+      { label: "Audit & Export", icon: ClipboardList, path: "/audit-export" },
+      { label: "Carbon & ESG", icon: Leaf, path: "/carbon-esg" },
+    ],
+  },
+  {
+    title: "Platform",
+    items: [
+      { label: "Notifications", icon: BellRing, path: "/notifications" },
+      { label: "Training LMS", icon: GraduationCap, path: "/training" },
+      { label: "Marketplace", icon: Store, path: "/marketplace" },
+      { label: "Localization", icon: Globe, path: "/localization" },
+      { label: "Offline Mode", icon: WifiOff, path: "/offline-field" },
+      { label: "White-Label", icon: Paintbrush, path: "/white-label" },
+      { label: "Settings", icon: Settings, path: "/settings" },
+    ],
+  },
 ];
 
 export default function DashboardLayout() {
@@ -61,6 +99,7 @@ export default function DashboardLayout() {
     await signOut();
     navigate("/login");
   };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -80,27 +119,36 @@ export default function DashboardLayout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-colors duration-150
-                  ${isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                  }
-                  ${collapsed ? "justify-center" : ""}
-                `}
-                title={collapsed ? item.label : undefined}
-              >
-                <item.icon className="w-[18px] h-[18px] shrink-0" strokeWidth={1.75} />
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
+          {navSections.map((section) => (
+            <div key={section.title}>
+              {!collapsed && (
+                <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                  {section.title}
+                </p>
+              )}
+              {section.items.map((item) => {
+                const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150
+                      ${isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                      }
+                      ${collapsed ? "justify-center" : ""}
+                    `}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <item.icon className="w-[17px] h-[17px] shrink-0" strokeWidth={1.75} />
+                    {!collapsed && <span>{item.label}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* Collapse toggle */}
