@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
+import NotificationCenter from "@/components/NotificationCenter";
 import {
   LayoutDashboard,
   Map,
