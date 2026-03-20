@@ -1,63 +1,54 @@
 import { useState } from 'react';
-import { Landmark, DollarSign, Clock, CheckCircle, AlertTriangle, Download, Banknote, FileText, TrendingUp } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth';
+import { DollarSign, Clock, Banknote, FileText, Download, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type RevenueCategory = 'registration' | 'authorization' | 'certification' | 'penalty';
-type DisbursementStatus = 'completed' | 'pending' | 'processing';
-
-const categoryConfig: Record<RevenueCategory, { label: string; className: string }> = {
+const categoryConfig: Record<string, { label: string; className: string }> = {
   registration: { label: 'Registration', className: 'bg-blue-50 text-blue-700' },
   authorization: { label: 'Authorization', className: 'bg-emerald-50 text-emerald-700' },
   certification: { label: 'Certification', className: 'bg-purple-50 text-purple-700' },
   penalty: { label: 'Penalty', className: 'bg-red-50 text-red-700' },
 };
 
-const stats = [
-  { label: 'Total Revenue Collected', value: '$12,450.00', icon: DollarSign, color: 'bg-emerald-50 text-emerald-600' },
-  { label: 'Pending Disbursement', value: '$3,215.00', icon: Clock, color: 'bg-amber-50 text-amber-600' },
-  { label: 'Last Disbursement', value: '$8,320.00', subtext: 'Mar 1, 2026', icon: Banknote, color: 'bg-blue-50 text-blue-600' },
-  { label: 'Active Registrations', value: '1,247', icon: FileText, color: 'bg-purple-50 text-purple-600' },
-];
-
-const revenueRecords = [
-  { id: 'REV-001', date: '2026-03-20', category: 'registration' as RevenueCategory, description: 'Drone Registration — SKW-US-A7B3X9', gross: '$5.00', commission: '$1.50', govAmount: '$3.50', disbursed: false },
-  { id: 'REV-002', date: '2026-03-19', category: 'authorization' as RevenueCategory, description: 'LAANC Authorization — LAANC-2026-0142', gross: '$2.00', commission: '$0.60', govAmount: '$1.40', disbursed: false },
-  { id: 'REV-003', date: '2026-03-18', category: 'registration' as RevenueCategory, description: 'Drone Registration — SKW-US-K9M2P4', gross: '$5.00', commission: '$1.50', govAmount: '$3.50', disbursed: false },
-  { id: 'REV-004', date: '2026-03-17', category: 'certification' as RevenueCategory, description: 'Part 107 Certification Verification', gross: '$10.00', commission: '$3.00', govAmount: '$7.00', disbursed: false },
-  { id: 'REV-005', date: '2026-03-15', category: 'penalty' as RevenueCategory, description: 'Late Registration Renewal Penalty', gross: '$1.25', commission: '$0.38', govAmount: '$0.87', disbursed: false },
-  { id: 'REV-006', date: '2026-03-10', category: 'registration' as RevenueCategory, description: 'Drone Registration x3 (batch)', gross: '$15.00', commission: '$4.50', govAmount: '$10.50', disbursed: true },
-  { id: 'REV-007', date: '2026-03-05', category: 'authorization' as RevenueCategory, description: 'LAANC Authorization x12 (batch)', gross: '$24.00', commission: '$7.20', govAmount: '$16.80', disbursed: true },
-];
-
-const disbursements = [
-  { id: 'DSB-006', period: 'Feb 16 - Mar 1, 2026', amount: '$8,320.00', records: 142, status: 'completed' as DisbursementStatus, method: 'ACH', reference: 'ACH-2026-03-001' },
-  { id: 'DSB-005', period: 'Feb 1 - Feb 15, 2026', amount: '$6,840.00', records: 118, status: 'completed' as DisbursementStatus, method: 'ACH', reference: 'ACH-2026-02-015' },
-  { id: 'DSB-004', period: 'Jan 16 - Jan 31, 2026', amount: '$7,150.00', records: 124, status: 'completed' as DisbursementStatus, method: 'Wire', reference: 'WIRE-2026-02-001' },
-];
-
-const feeSchedule = [
-  { type: 'Standard Annual', fee: '$5.00', govSplit: '70%', platformSplit: '30%' },
-  { type: 'Commercial Annual', fee: '$5.00', govSplit: '70%', platformSplit: '30%' },
-  { type: 'Government', fee: 'Waived', govSplit: '—', platformSplit: '—' },
-  { type: 'Educational', fee: 'Waived', govSplit: '—', platformSplit: '—' },
-  { type: 'Tourist 7-Day Permit', fee: '$15.00', govSplit: '70%', platformSplit: '30%' },
-  { type: 'Researcher 30-Day Permit', fee: '$25.00', govSplit: '70%', platformSplit: '30%' },
-  { type: 'Temp Operator 90-Day', fee: '$50.00', govSplit: '70%', platformSplit: '30%' },
-  { type: 'Event Permit (per day)', fee: '$10.00', govSplit: '70%', platformSplit: '30%' },
-];
-
-const categoryBreakdown = [
-  { cat: 'Registration Fees', amount: '$8,450.00', pct: 68, color: 'bg-blue-500' },
-  { cat: 'Authorization Fees', amount: '$2,680.00', pct: 22, color: 'bg-emerald-500' },
-  { cat: 'Certification Fees', amount: '$960.00', pct: 8, color: 'bg-purple-500' },
-  { cat: 'Penalties', amount: '$360.00', pct: 2, color: 'bg-red-500' },
-];
+function formatCents(cents: number, currency: string = 'USD') {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(cents / 100);
+}
 
 export default function GovernmentRevenuePage() {
+  const { profile } = useAuth();
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [disbursedFilter, setDisbursedFilter] = useState<'all' | 'pending' | 'disbursed'>('all');
 
-  const filteredRecords = revenueRecords.filter((r) => {
+  const { data: records = [] } = useQuery({
+    queryKey: ['gov-revenue-records'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('government_revenue_records').select('*').order('created_at', { ascending: false }).limit(100);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: disbursements = [] } = useQuery({
+    queryKey: ['gov-disbursements'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('government_disbursements').select('*').order('created_at', { ascending: false }).limit(20);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: feeSchedules = [] } = useQuery({
+    queryKey: ['fee-schedules-gov'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('registration_fee_schedules').select('*').eq('is_active', true).limit(10);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const filteredRecords = records.filter((r) => {
     if (categoryFilter !== 'all' && r.category !== categoryFilter) return false;
     if (disbursedFilter === 'pending' && r.disbursed) return false;
     if (disbursedFilter === 'disbursed' && !r.disbursed) return false;
@@ -65,26 +56,41 @@ export default function GovernmentRevenuePage() {
   });
 
   const totals = filteredRecords.reduce((acc, r) => {
-    acc.gross += parseFloat(r.gross.replace('$', ''));
-    acc.commission += parseFloat(r.commission.replace('$', ''));
-    acc.gov += parseFloat(r.govAmount.replace('$', ''));
+    acc.gross += r.gross_amount;
+    acc.commission += r.platform_commission;
+    acc.gov += r.government_amount;
     return acc;
   }, { gross: 0, commission: 0, gov: 0 });
 
+  const totalRevenue = records.reduce((s, r) => s + r.gross_amount, 0);
+  const pendingAmount = records.filter((r) => !r.disbursed).reduce((s, r) => s + r.government_amount, 0);
+  const lastDisbursement = disbursements[0];
+
+  const categoryBreakdown = ['registration', 'authorization', 'certification', 'penalty'].map((cat) => {
+    const catRecords = records.filter((r) => r.category === cat);
+    const amount = catRecords.reduce((s, r) => s + r.gross_amount, 0);
+    return { cat: categoryConfig[cat]?.label ?? cat, amount, pct: totalRevenue > 0 ? Math.round((amount / totalRevenue) * 100) : 0 };
+  }).filter((c) => c.amount > 0);
+
+  const stats = [
+    { label: 'Total Revenue Collected', value: formatCents(totalRevenue), icon: DollarSign, color: 'bg-emerald-50 text-emerald-600' },
+    { label: 'Pending Disbursement', value: formatCents(pendingAmount), icon: Clock, color: 'bg-amber-50 text-amber-600' },
+    { label: 'Last Disbursement', value: lastDisbursement ? formatCents(lastDisbursement.total_amount, lastDisbursement.currency) : '—', icon: Banknote, color: 'bg-blue-50 text-blue-600' },
+    { label: 'Total Records', value: String(records.length), icon: FileText, color: 'bg-purple-50 text-purple-600' },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Government Revenue Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Revenue collected on behalf of Federal Aviation Administration (FAA)</p>
+          <p className="text-sm text-muted-foreground">Revenue collected on behalf of regulatory authority</p>
         </div>
         <button className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
           <Download className="h-4 w-4" /> Export Report
         </button>
       </div>
 
-      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -94,56 +100,61 @@ export default function GovernmentRevenuePage() {
               <div>
                 <p className="text-xl font-bold tabular-nums text-foreground">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
-                {stat.subtext && <p className="text-xs text-muted-foreground">{stat.subtext}</p>}
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Revenue by Category */}
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* Category breakdown */}
         <div className="rounded-xl border border-border bg-card p-6">
           <h2 className="mb-4 text-lg font-semibold text-foreground">Revenue by Category</h2>
-          <div className="space-y-3">
-            {categoryBreakdown.map((item) => (
-              <div key={item.cat}>
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">{item.cat}</span>
-                  <span className="font-medium text-foreground">{item.amount}</span>
+          {categoryBreakdown.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No revenue records yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {categoryBreakdown.map((item) => (
+                <div key={item.cat}>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-muted-foreground">{item.cat}</span>
+                    <span className="font-medium text-foreground">{formatCents(item.amount)}</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${item.pct}%` }} />
+                  </div>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div className={cn('h-full rounded-full', item.color)} style={{ width: `${item.pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Fee Schedule */}
         <div className="rounded-xl border border-border bg-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Fee Schedule — United States (FAA)</h2>
+            <h2 className="text-lg font-semibold text-foreground">Fee Schedule</h2>
             <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">Read-only</span>
           </div>
-          <table className="w-full text-sm">
-            <thead><tr className="border-b border-border">
-              <th className="pb-2 text-left font-medium text-muted-foreground">Fee Type</th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">Amount</th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">Gov</th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">Platform</th>
-            </tr></thead>
-            <tbody>
-              {feeSchedule.map((fee) => (
-                <tr key={fee.type} className="border-b border-border/50">
-                  <td className="py-2 text-foreground">{fee.type}</td>
-                  <td className="py-2 text-right tabular-nums text-foreground">{fee.fee}</td>
-                  <td className="py-2 text-right text-muted-foreground">{fee.govSplit}</td>
-                  <td className="py-2 text-right text-muted-foreground">{fee.platformSplit}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {feeSchedules.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No fee schedule configured for your region.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead><tr className="border-b border-border">
+                <th className="pb-2 text-left font-medium text-muted-foreground">Fee Type</th>
+                <th className="pb-2 text-right font-medium text-muted-foreground">Amount</th>
+                <th className="pb-2 text-right font-medium text-muted-foreground">Gov %</th>
+              </tr></thead>
+              <tbody>
+                {feeSchedules.map((fee) => (
+                  <tr key={fee.id} className="border-b border-border/50">
+                    <td className="py-2 text-foreground">Standard Annual</td>
+                    <td className="py-2 text-right tabular-nums text-foreground">{formatCents(fee.standard_annual_fee, fee.currency)}</td>
+                    <td className="py-2 text-right text-muted-foreground">{(Number(fee.government_revenue_split) * 100).toFixed(0)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -151,9 +162,9 @@ export default function GovernmentRevenuePage() {
       <div className="rounded-xl border border-border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold text-foreground">Revenue Records</h2>
         <div className="flex flex-wrap gap-2 mb-4">
-          {(['all', 'registration', 'authorization', 'certification', 'penalty'] as const).map((c) => (
+          {['all', 'registration', 'authorization', 'certification', 'penalty'].map((c) => (
             <button key={c} onClick={() => setCategoryFilter(c)} className={cn('rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors', categoryFilter === c ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-card border-border text-muted-foreground hover:bg-accent')}>
-              {c === 'all' ? 'All Categories' : categoryConfig[c].label}
+              {c === 'all' ? 'All Categories' : categoryConfig[c]?.label ?? c}
             </button>
           ))}
           <div className="w-px bg-border mx-1" />
@@ -175,27 +186,31 @@ export default function GovernmentRevenuePage() {
               <th className="pb-3 text-center font-medium text-muted-foreground">Status</th>
             </tr></thead>
             <tbody>
-              {filteredRecords.map((r) => {
-                const cat = categoryConfig[r.category];
+              {filteredRecords.length === 0 ? (
+                <tr><td colSpan={7} className="py-8 text-center text-sm text-muted-foreground">No revenue records found</td></tr>
+              ) : filteredRecords.map((r) => {
+                const cat = categoryConfig[r.category] ?? { label: r.category, className: 'bg-muted text-muted-foreground' };
                 return (
                   <tr key={r.id} className="border-b border-border/50">
-                    <td className="py-3 text-muted-foreground">{r.date}</td>
+                    <td className="py-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
                     <td className="py-3"><span className={cn('inline-flex rounded-full px-2.5 py-1 text-xs font-medium', cat.className)}>{cat.label}</span></td>
-                    <td className="py-3 text-foreground">{r.description}</td>
-                    <td className="py-3 text-right tabular-nums font-medium text-foreground">{r.gross}</td>
-                    <td className="py-3 text-right tabular-nums text-muted-foreground">{r.commission}</td>
-                    <td className="py-3 text-right tabular-nums font-medium text-foreground">{r.govAmount}</td>
+                    <td className="py-3 text-foreground">{r.description ?? '—'}</td>
+                    <td className="py-3 text-right tabular-nums font-medium text-foreground">{formatCents(r.gross_amount, r.currency)}</td>
+                    <td className="py-3 text-right tabular-nums text-muted-foreground">{formatCents(r.platform_commission, r.currency)}</td>
+                    <td className="py-3 text-right tabular-nums font-medium text-foreground">{formatCents(r.government_amount, r.currency)}</td>
                     <td className="py-3 text-center">{r.disbursed ? <span className="text-xs text-emerald-600 font-medium">Disbursed</span> : <span className="text-xs text-amber-600 font-medium">Pending</span>}</td>
                   </tr>
                 );
               })}
-              <tr className="font-semibold">
-                <td colSpan={3} className="py-3 text-foreground">Totals</td>
-                <td className="py-3 text-right tabular-nums text-foreground">${totals.gross.toFixed(2)}</td>
-                <td className="py-3 text-right tabular-nums text-muted-foreground">${totals.commission.toFixed(2)}</td>
-                <td className="py-3 text-right tabular-nums text-foreground">${totals.gov.toFixed(2)}</td>
-                <td />
-              </tr>
+              {filteredRecords.length > 0 && (
+                <tr className="font-semibold">
+                  <td colSpan={3} className="py-3 text-foreground">Totals</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{formatCents(totals.gross)}</td>
+                  <td className="py-3 text-right tabular-nums text-muted-foreground">{formatCents(totals.commission)}</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{formatCents(totals.gov)}</td>
+                  <td />
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -204,22 +219,25 @@ export default function GovernmentRevenuePage() {
       {/* Disbursement History */}
       <div className="rounded-xl border border-border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold text-foreground">Disbursement History</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {disbursements.map((d) => (
-            <div key={d.id} className="rounded-lg border border-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-xs text-foreground">{d.id}</span>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600"><CheckCircle className="h-3.5 w-3.5" /> {d.status === 'completed' ? 'Disbursed' : d.status}</span>
+        {disbursements.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No disbursements yet.</p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {disbursements.map((d) => (
+              <div key={d.id} className="rounded-lg border border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono text-xs text-foreground">{d.id.slice(0, 8)}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600"><CheckCircle className="h-3.5 w-3.5" /> {d.status}</span>
+                </div>
+                <p className="text-xl font-bold tabular-nums text-foreground">{formatCents(d.total_amount, d.currency)}</p>
+                <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <p>{d.record_count} transactions · {d.disbursement_method.replace(/_/g, ' ')}</p>
+                  {d.reference && <p>Ref: {d.reference}</p>}
+                </div>
               </div>
-              <p className="text-xl font-bold tabular-nums text-foreground">{d.amount}</p>
-              <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                <p>Period: {d.period}</p>
-                <p>{d.records} transactions · {d.method}</p>
-                <p>Ref: {d.reference}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

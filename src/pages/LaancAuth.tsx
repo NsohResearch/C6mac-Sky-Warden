@@ -1,16 +1,27 @@
-import { Shield, Clock, CheckCircle2, XCircle, AlertTriangle, ArrowRight, FileText } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Shield, Clock, CheckCircle2, XCircle, ArrowRight, FileText } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
 
-const authorizations = [
-  { id: "LAANC-C6M-2847-A", type: "Near-Real-Time", area: "Class B — Metro Airport", altitude: "280 ft AGL", maxGrid: "300 ft", status: "approved" as const, time: "12 min ago", pilot: "R. Vasquez" },
-  { id: "LAANC-C6M-2846-A", type: "Near-Real-Time", area: "Class D — Regional Field", altitude: "400 ft AGL", maxGrid: "400 ft", status: "approved" as const, time: "1 hr ago", pilot: "T. Chen" },
-  { id: "LAANC-C6M-2845-A", type: "Further Coordination", area: "Class B — Metro Airport", altitude: "350 ft AGL", maxGrid: "200 ft", status: "pending" as const, time: "2 hr ago", pilot: "M. Okafor" },
-  { id: "LAANC-C6M-2843-A", type: "Near-Real-Time", area: "Class D — Regional Field", altitude: "200 ft AGL", maxGrid: "400 ft", status: "denied" as const, time: "5 hr ago", pilot: "L. Martinez" },
-  { id: "LAANC-C6M-2840-A", type: "Near-Real-Time", area: "Class E — Transition Area", altitude: "120 ft AGL", maxGrid: "400 ft", status: "approved" as const, time: "Yesterday", pilot: "K. Nguyen" },
-];
-
 export default function LaancAuth() {
+  const { data: authorizations = [], isLoading } = useQuery({
+    queryKey: ["laanc-authorizations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("flight_authorizations")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const approvedCount = authorizations.filter((a) => a.status === "approved").length;
+  const pendingCount = authorizations.filter((a) => a.status === "pending").length;
+  const deniedCount = authorizations.filter((a) => a.status === "denied" || a.status === "rejected").length;
+
   return (
     <div className="p-6 max-w-[1400px] mx-auto space-y-6">
       <div className="animate-reveal-up">
@@ -19,10 +30,10 @@ export default function LaancAuth() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Requests" value="142" change="This month" icon={FileText} delay={80} />
-        <StatCard label="Approved" value="128" change="90.1% rate" changeType="positive" icon={CheckCircle2} delay={160} />
-        <StatCard label="Pending Review" value="6" change="Avg 4.2 hr" changeType="neutral" icon={Clock} delay={240} />
-        <StatCard label="Denied" value="8" change="5.6% rate" changeType="negative" icon={XCircle} delay={320} />
+        <StatCard label="Total Requests" value={String(authorizations.length)} change="All time" icon={FileText} delay={80} />
+        <StatCard label="Approved" value={String(approvedCount)} change={authorizations.length > 0 ? `${((approvedCount / authorizations.length) * 100).toFixed(1)}% rate` : "—"} changeType="positive" icon={CheckCircle2} delay={160} />
+        <StatCard label="Pending Review" value={String(pendingCount)} change="Awaiting response" changeType="neutral" icon={Clock} delay={240} />
+        <StatCard label="Denied" value={String(deniedCount)} change={authorizations.length > 0 ? `${((deniedCount / authorizations.length) * 100).toFixed(1)}% rate` : "—"} changeType={deniedCount > 0 ? "negative" : "positive"} icon={XCircle} delay={320} />
       </div>
 
       {/* Auth process */}
@@ -49,8 +60,7 @@ export default function LaancAuth() {
       {/* Table */}
       <div className="bg-card rounded-lg shadow-card animate-reveal-up delay-5">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-foreground">Recent Authorizations</h2>
-          <button className="text-xs font-medium text-accent hover:underline">Request New</button>
+          <h2 className="text-sm font-semibold text-foreground">Authorization History</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -59,28 +69,39 @@ export default function LaancAuth() {
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Reference</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Type</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Airspace</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Requested / Grid Max</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Pilot</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Requested / Approved</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Status</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Date</th>
               </tr>
             </thead>
             <tbody>
-              {authorizations.map((auth) => (
-                <tr key={auth.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="px-5 py-3 text-sm font-medium text-foreground mono text-xs">{auth.id}</td>
-                  <td className="px-5 py-3">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                      auth.type === "Near-Real-Time" ? "bg-success/10 text-success" : "bg-info/10 text-info"
-                    }`}>{auth.type}</span>
-                  </td>
-                  <td className="px-5 py-3 text-sm text-muted-foreground">{auth.area}</td>
-                  <td className="px-5 py-3 text-sm text-muted-foreground tabular">{auth.altitude} / {auth.maxGrid}</td>
-                  <td className="px-5 py-3 text-sm text-muted-foreground">{auth.pilot}</td>
-                  <td className="px-5 py-3">
-                    <StatusBadge status={auth.status}>{auth.status.charAt(0).toUpperCase() + auth.status.slice(1)}</StatusBadge>
-                  </td>
-                </tr>
-              ))}
+              {isLoading ? (
+                <tr><td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">Loading…</td></tr>
+              ) : authorizations.length === 0 ? (
+                <tr><td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">No LAANC authorizations yet</td></tr>
+              ) : authorizations.map((auth) => {
+                const statusMap: Record<string, "approved" | "pending" | "denied" | "active" | "neutral"> = {
+                  approved: "approved", pending: "pending", denied: "denied", rejected: "denied", active: "active", expired: "neutral",
+                };
+                return (
+                  <tr key={auth.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td className="px-5 py-3 text-xs font-medium text-foreground mono">{auth.reference_code}</td>
+                    <td className="px-5 py-3">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                        auth.authorization_type === "near_real_time" ? "bg-success/10 text-success" : "bg-info/10 text-info"
+                      }`}>{auth.authorization_type?.replace(/_/g, ' ') ?? '—'}</span>
+                    </td>
+                    <td className="px-5 py-3 text-sm text-muted-foreground">{auth.airspace_class ? `Class ${auth.airspace_class}` : '—'}</td>
+                    <td className="px-5 py-3 text-sm text-muted-foreground tabular">{auth.requested_altitude_ft} ft{auth.approved_altitude_ft ? ` / ${auth.approved_altitude_ft} ft` : ''}</td>
+                    <td className="px-5 py-3">
+                      <StatusBadge status={statusMap[auth.status] ?? "neutral"}>
+                        {auth.status.charAt(0).toUpperCase() + auth.status.slice(1)}
+                      </StatusBadge>
+                    </td>
+                    <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(auth.created_at).toLocaleDateString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
