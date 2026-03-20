@@ -26,6 +26,8 @@ import GovernmentRevenuePage from "@/pages/GovernmentRevenuePage";
 import SafetyReports from "@/pages/SafetyReports";
 import B4UFly from "@/pages/B4UFly";
 import LiveTelemetry from "@/pages/LiveTelemetry";
+import Weather from "@/pages/Weather";
+import PilotLogbook from "@/pages/PilotLogbook";
 import InstallApp from "@/pages/InstallApp";
 import NotFound from "@/pages/NotFound";
 
@@ -63,6 +65,8 @@ const App = () => (
               <Route path="/remote-id" element={<RemoteId />} />
               <Route path="/safety-reports" element={<SafetyReports />} />
               <Route path="/b4ufly" element={<B4UFly />} />
+              <Route path="/weather" element={<Weather />} />
+              <Route path="/pilot-logbook" element={<PilotLogbook />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/registration" element={<DroneRegistrationPage />} />
               <Route path="/billing" element={<BillingPage />} />
