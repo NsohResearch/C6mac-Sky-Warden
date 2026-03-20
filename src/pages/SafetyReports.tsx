@@ -47,8 +47,8 @@ const NASA_6_CONDITIONS = [
   "NASA ASRS report filed within 10 days of the incident",
 ];
 
-const statusColors: Record<ReportStatus, "warning" | "info" | "active" | "error" | "inactive"> = {
-  draft: "inactive",
+const statusColors: Record<ReportStatus, "warning" | "info" | "active" | "error" | "neutral" | "pending"> = {
+  draft: "neutral",
   submitted: "info",
   under_investigation: "warning",
   closed: "active",

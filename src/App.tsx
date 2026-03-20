@@ -23,6 +23,8 @@ import PricingPage from "@/pages/PricingPage";
 import BillingPage from "@/pages/BillingPage";
 import DroneRegistrationPage from "@/pages/DroneRegistrationPage";
 import GovernmentRevenuePage from "@/pages/GovernmentRevenuePage";
+import SafetyReports from "@/pages/SafetyReports";
+import B4UFly from "@/pages/B4UFly";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -55,6 +57,8 @@ const App = () => (
               <Route path="/flight-plans" element={<FlightPlans />} />
               <Route path="/laanc" element={<LaancAuth />} />
               <Route path="/remote-id" element={<RemoteId />} />
+              <Route path="/safety-reports" element={<SafetyReports />} />
+              <Route path="/b4ufly" element={<B4UFly />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/registration" element={<DroneRegistrationPage />} />
               <Route path="/billing" element={<BillingPage />} />
