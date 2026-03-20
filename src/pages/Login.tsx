@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import logoMark from "@/assets/logo-mark.png";
 import heroAirspace from "@/assets/hero-airspace.jpg";
 
@@ -8,11 +10,21 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
+    setSubmitting(true);
+    const { error } = await signIn(email, password);
+    setSubmitting(false);
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -37,6 +49,7 @@ export default function Login() {
               <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
               <input
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="pilot@c6maceye.com"
@@ -48,6 +61,7 @@ export default function Login() {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -65,15 +79,17 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full h-10 rounded-md bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-[0.98] shadow-card"
+              disabled={submitting}
+              className="w-full h-10 rounded-md bg-accent text-accent-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-[0.98] shadow-sm disabled:opacity-50"
             >
-              Sign In
-              <ArrowRight className="w-4 h-4" />
+              {submitting ? "Signing in…" : "Sign In"}
+              {!submitting && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
 
           <p className="text-xs text-muted-foreground text-center mt-6">
-            FAA-approved airspace management platform
+            Don't have an account?{" "}
+            <Link to="/register" className="text-accent hover:underline">Create one</Link>
           </p>
         </div>
       </div>
