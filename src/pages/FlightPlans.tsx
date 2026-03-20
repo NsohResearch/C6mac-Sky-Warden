@@ -83,7 +83,7 @@ export default function FlightPlans() {
         action: wp.action,
       }));
 
-      const { error } = await supabase.from('missions').insert({
+      const insertData: Record<string, unknown> = {
         tenant_id: profile!.tenant_id,
         region: region,
         title: planName,
@@ -100,7 +100,8 @@ export default function FlightPlans() {
           flight_rules: flightRules,
           estimated_duration: estimatedDuration,
         },
-      });
+      };
+      const { error } = await supabase.from('missions').insert(insertData as any);
       if (error) throw error;
       toast({ title: 'Flight plan saved', description: `"${planName}" created as draft mission.` });
       setPlanName('');

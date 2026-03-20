@@ -2132,6 +2132,16 @@ export type Database = {
         | "SN"
         | "CI"
         | "UG"
+        | "TD"
+        | "CF"
+        | "CG"
+        | "GQ"
+        | "GA"
+        | "BW"
+        | "ZM"
+        | "SS"
+        | "AO"
+        | "CD"
       registration_status:
         | "pending_payment"
         | "pending_review"
@@ -2381,6 +2391,16 @@ export const Constants = {
         "SN",
         "CI",
         "UG",
+        "TD",
+        "CF",
+        "CG",
+        "GQ",
+        "GA",
+        "BW",
+        "ZM",
+        "SS",
+        "AO",
+        "CD",
       ],
       registration_status: [
         "pending_payment",
