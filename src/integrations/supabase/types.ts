@@ -277,6 +277,165 @@ export type Database = {
           },
         ]
       }
+      drone_registrations: {
+        Row: {
+          auto_renew: boolean
+          category: string
+          certificate_url: string | null
+          created_at: string
+          currency: string
+          digital_drone_id: string | null
+          drone_id: string
+          expires_at: string | null
+          fee_invoice_id: string | null
+          fee_paid_at: string | null
+          government_portion_fee: number
+          id: string
+          issued_at: string | null
+          manufacturer: string
+          model: string
+          owner_address: Json
+          owner_email: string
+          owner_id: string
+          owner_name: string
+          platform_portion_fee: number
+          previous_registration_id: string | null
+          publicly_verifiable: boolean
+          qr_code_url: string | null
+          region: Database["public"]["Enums"]["region_code"]
+          registration_fee: number
+          registration_number: string | null
+          registration_type: Database["public"]["Enums"]["registration_type"]
+          regulatory_authority: string
+          remote_id_serial: string | null
+          serial_number: string
+          status: Database["public"]["Enums"]["registration_status"]
+          suspension_reason: string | null
+          tenant_id: string
+          transferred_at: string | null
+          transferred_from: string | null
+          updated_at: string
+          verification_code: string | null
+          weight_grams: number
+        }
+        Insert: {
+          auto_renew?: boolean
+          category: string
+          certificate_url?: string | null
+          created_at?: string
+          currency?: string
+          digital_drone_id?: string | null
+          drone_id: string
+          expires_at?: string | null
+          fee_invoice_id?: string | null
+          fee_paid_at?: string | null
+          government_portion_fee?: number
+          id?: string
+          issued_at?: string | null
+          manufacturer: string
+          model: string
+          owner_address?: Json
+          owner_email: string
+          owner_id: string
+          owner_name: string
+          platform_portion_fee?: number
+          previous_registration_id?: string | null
+          publicly_verifiable?: boolean
+          qr_code_url?: string | null
+          region?: Database["public"]["Enums"]["region_code"]
+          registration_fee?: number
+          registration_number?: string | null
+          registration_type?: Database["public"]["Enums"]["registration_type"]
+          regulatory_authority?: string
+          remote_id_serial?: string | null
+          serial_number: string
+          status?: Database["public"]["Enums"]["registration_status"]
+          suspension_reason?: string | null
+          tenant_id: string
+          transferred_at?: string | null
+          transferred_from?: string | null
+          updated_at?: string
+          verification_code?: string | null
+          weight_grams?: number
+        }
+        Update: {
+          auto_renew?: boolean
+          category?: string
+          certificate_url?: string | null
+          created_at?: string
+          currency?: string
+          digital_drone_id?: string | null
+          drone_id?: string
+          expires_at?: string | null
+          fee_invoice_id?: string | null
+          fee_paid_at?: string | null
+          government_portion_fee?: number
+          id?: string
+          issued_at?: string | null
+          manufacturer?: string
+          model?: string
+          owner_address?: Json
+          owner_email?: string
+          owner_id?: string
+          owner_name?: string
+          platform_portion_fee?: number
+          previous_registration_id?: string | null
+          publicly_verifiable?: boolean
+          qr_code_url?: string | null
+          region?: Database["public"]["Enums"]["region_code"]
+          registration_fee?: number
+          registration_number?: string | null
+          registration_type?: Database["public"]["Enums"]["registration_type"]
+          regulatory_authority?: string
+          remote_id_serial?: string | null
+          serial_number?: string
+          status?: Database["public"]["Enums"]["registration_status"]
+          suspension_reason?: string | null
+          tenant_id?: string
+          transferred_at?: string | null
+          transferred_from?: string | null
+          updated_at?: string
+          verification_code?: string | null
+          weight_grams?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drone_registrations_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_registrations_fee_invoice_id_fkey"
+            columns: ["fee_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_registrations_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_registrations_previous_registration_id_fkey"
+            columns: ["previous_registration_id"]
+            isOneToOne: false
+            referencedRelation: "drone_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_registrations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drones: {
         Row: {
           battery_cycle_count: number | null
@@ -487,6 +646,265 @@ export type Database = {
           },
         ]
       }
+      government_disbursements: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          currency: string
+          disbursement_method: Database["public"]["Enums"]["disbursement_method"]
+          id: string
+          period_end: string
+          period_start: string
+          record_count: number
+          reference: string | null
+          region: Database["public"]["Enums"]["region_code"]
+          regulatory_authority: string
+          status: Database["public"]["Enums"]["disbursement_status"]
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          disbursement_method?: Database["public"]["Enums"]["disbursement_method"]
+          id?: string
+          period_end: string
+          period_start: string
+          record_count?: number
+          reference?: string | null
+          region: Database["public"]["Enums"]["region_code"]
+          regulatory_authority: string
+          status?: Database["public"]["Enums"]["disbursement_status"]
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          disbursement_method?: Database["public"]["Enums"]["disbursement_method"]
+          id?: string
+          period_end?: string
+          period_start?: string
+          record_count?: number
+          reference?: string | null
+          region?: Database["public"]["Enums"]["region_code"]
+          regulatory_authority?: string
+          status?: Database["public"]["Enums"]["disbursement_status"]
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      government_revenue_records: {
+        Row: {
+          category: Database["public"]["Enums"]["gov_revenue_category"]
+          created_at: string
+          currency: string
+          description: string | null
+          disbursed: boolean
+          disbursed_at: string | null
+          disbursement_reference: string | null
+          government_amount: number
+          gross_amount: number
+          id: string
+          period_end: string | null
+          period_start: string | null
+          platform_commission: number
+          reference_id: string | null
+          reference_type: string | null
+          region: Database["public"]["Enums"]["region_code"]
+          regulatory_authority: string
+          tenant_id: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["gov_revenue_category"]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          disbursed?: boolean
+          disbursed_at?: string | null
+          disbursement_reference?: string | null
+          government_amount?: number
+          gross_amount?: number
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          platform_commission?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          region: Database["public"]["Enums"]["region_code"]
+          regulatory_authority: string
+          tenant_id?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["gov_revenue_category"]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          disbursed?: boolean
+          disbursed_at?: string | null
+          disbursement_reference?: string | null
+          government_amount?: number
+          gross_amount?: number
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          platform_commission?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          region?: Database["public"]["Enums"]["region_code"]
+          regulatory_authority?: string
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "government_revenue_records_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_line_items: {
+        Row: {
+          category: Database["public"]["Enums"]["line_item_category"]
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          metadata: Json
+          quantity: number
+          revenue_recipient: Database["public"]["Enums"]["revenue_recipient"]
+          taxable: boolean
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["line_item_category"]
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          metadata?: Json
+          quantity?: number
+          revenue_recipient?: Database["public"]["Enums"]["revenue_recipient"]
+          taxable?: boolean
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["line_item_category"]
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          metadata?: Json
+          quantity?: number
+          revenue_recipient?: Database["public"]["Enums"]["revenue_recipient"]
+          taxable?: boolean
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_line_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          created_at: string
+          currency: string
+          due_date: string | null
+          government_fees: number
+          id: string
+          invoice_number: string
+          issued_at: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          pdf_url: string | null
+          platform_fees: number
+          receipt_url: string | null
+          status: Database["public"]["Enums"]["invoice_status"]
+          subscription_id: string | null
+          subtotal: number
+          tax_amount: number
+          tax_rate: number
+          tenant_id: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          government_fees?: number
+          id?: string
+          invoice_number: string
+          issued_at?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          pdf_url?: string | null
+          platform_fees?: number
+          receipt_url?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subscription_id?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          tenant_id: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          government_fees?: number
+          id?: string
+          invoice_number?: string
+          issued_at?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          pdf_url?: string | null
+          platform_fees?: number
+          receipt_url?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subscription_id?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          tenant_id?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           actual_end: string | null
@@ -650,6 +1068,74 @@ export type Database = {
           },
         ]
       }
+      payment_methods: {
+        Row: {
+          account_last4: string | null
+          bank_name: string | null
+          card_brand: string | null
+          card_exp_month: number | null
+          card_exp_year: number | null
+          card_last4: string | null
+          created_at: string
+          external_payment_method_id: string | null
+          id: string
+          is_default: boolean
+          mobile_number: string | null
+          mobile_provider:
+            | Database["public"]["Enums"]["mobile_money_provider"]
+            | null
+          tenant_id: string
+          type: Database["public"]["Enums"]["payment_method_type"]
+          updated_at: string
+        }
+        Insert: {
+          account_last4?: string | null
+          bank_name?: string | null
+          card_brand?: string | null
+          card_exp_month?: number | null
+          card_exp_year?: number | null
+          card_last4?: string | null
+          created_at?: string
+          external_payment_method_id?: string | null
+          id?: string
+          is_default?: boolean
+          mobile_number?: string | null
+          mobile_provider?:
+            | Database["public"]["Enums"]["mobile_money_provider"]
+            | null
+          tenant_id: string
+          type: Database["public"]["Enums"]["payment_method_type"]
+          updated_at?: string
+        }
+        Update: {
+          account_last4?: string | null
+          bank_name?: string | null
+          card_brand?: string | null
+          card_exp_month?: number | null
+          card_exp_year?: number | null
+          card_last4?: string | null
+          created_at?: string
+          external_payment_method_id?: string | null
+          id?: string
+          is_default?: boolean
+          mobile_number?: string | null
+          mobile_provider?:
+            | Database["public"]["Enums"]["mobile_money_provider"]
+            | null
+          tenant_id?: string
+          type?: Database["public"]["Enums"]["payment_method_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pilot_profiles: {
         Row: {
           assigned_drone_ids: string[] | null
@@ -745,6 +1231,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      registration_fee_schedules: {
+        Row: {
+          commercial_annual_fee: number
+          created_at: string
+          currency: string
+          educational_fee: number
+          effective_date: string
+          event_per_day_fee: number
+          government_fee: number
+          government_revenue_split: number
+          id: string
+          is_active: boolean
+          late_fee_percentage: number
+          platform_revenue_split: number
+          region: Database["public"]["Enums"]["region_code"]
+          replacement_fee: number
+          researcher_30day_fee: number
+          standard_annual_fee: number
+          temp_operator_90day_fee: number
+          tourist_7day_fee: number
+          transfer_fee: number
+          updated_at: string
+        }
+        Insert: {
+          commercial_annual_fee?: number
+          created_at?: string
+          currency?: string
+          educational_fee?: number
+          effective_date?: string
+          event_per_day_fee?: number
+          government_fee?: number
+          government_revenue_split?: number
+          id?: string
+          is_active?: boolean
+          late_fee_percentage?: number
+          platform_revenue_split?: number
+          region: Database["public"]["Enums"]["region_code"]
+          replacement_fee?: number
+          researcher_30day_fee?: number
+          standard_annual_fee?: number
+          temp_operator_90day_fee?: number
+          tourist_7day_fee?: number
+          transfer_fee?: number
+          updated_at?: string
+        }
+        Update: {
+          commercial_annual_fee?: number
+          created_at?: string
+          currency?: string
+          educational_fee?: number
+          effective_date?: string
+          event_per_day_fee?: number
+          government_fee?: number
+          government_revenue_split?: number
+          id?: string
+          is_active?: boolean
+          late_fee_percentage?: number
+          platform_revenue_split?: number
+          region?: Database["public"]["Enums"]["region_code"]
+          replacement_fee?: number
+          researcher_30day_fee?: number
+          standard_annual_fee?: number
+          temp_operator_90day_fee?: number
+          tourist_7day_fee?: number
+          transfer_fee?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       remote_id_broadcasts: {
         Row: {
@@ -850,6 +1405,191 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          annual_amount: number
+          billing_cycle: Database["public"]["Enums"]["billing_cycle"]
+          cancel_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          currency: string
+          current_period_end: string | null
+          current_period_start: string | null
+          external_customer_id: string | null
+          external_subscription_id: string | null
+          id: string
+          monthly_amount: number
+          next_payment_date: string | null
+          past_due_amount: number
+          payment_method_id: string | null
+          plan_tier: Database["public"]["Enums"]["plan_tier"]
+          status: Database["public"]["Enums"]["subscription_status"]
+          tenant_id: string
+          trial_end: string | null
+          trial_start: string | null
+          updated_at: string
+        }
+        Insert: {
+          annual_amount?: number
+          billing_cycle?: Database["public"]["Enums"]["billing_cycle"]
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          external_customer_id?: string | null
+          external_subscription_id?: string | null
+          id?: string
+          monthly_amount?: number
+          next_payment_date?: string | null
+          past_due_amount?: number
+          payment_method_id?: string | null
+          plan_tier?: Database["public"]["Enums"]["plan_tier"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          tenant_id: string
+          trial_end?: string | null
+          trial_start?: string | null
+          updated_at?: string
+        }
+        Update: {
+          annual_amount?: number
+          billing_cycle?: Database["public"]["Enums"]["billing_cycle"]
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          external_customer_id?: string | null
+          external_subscription_id?: string | null
+          id?: string
+          monthly_amount?: number
+          next_payment_date?: string | null
+          past_due_amount?: number
+          payment_method_id?: string | null
+          plan_tier?: Database["public"]["Enums"]["plan_tier"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          tenant_id?: string
+          trial_end?: string | null
+          trial_start?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      temporary_permits: {
+        Row: {
+          applicant_email: string
+          applicant_name: string
+          applicant_nationality: string | null
+          applicant_phone: string | null
+          applicant_type: Database["public"]["Enums"]["temporary_permit_applicant_type"]
+          approval_conditions: string[]
+          created_at: string
+          currency: string
+          denial_reason: string | null
+          duration_days: number
+          end_date: string
+          id: string
+          max_renewals: number
+          operation_area: Json | null
+          operation_description: string | null
+          operation_locations: string[]
+          passport_number: string | null
+          permit_fee: number
+          permit_type: Database["public"]["Enums"]["temporary_permit_type"]
+          purpose: string
+          registration_id: string
+          renewal_count: number
+          required_documents: Json
+          security_deposit: number
+          start_date: string
+          status: Database["public"]["Enums"]["temporary_permit_status"]
+          updated_at: string
+        }
+        Insert: {
+          applicant_email: string
+          applicant_name: string
+          applicant_nationality?: string | null
+          applicant_phone?: string | null
+          applicant_type: Database["public"]["Enums"]["temporary_permit_applicant_type"]
+          approval_conditions?: string[]
+          created_at?: string
+          currency?: string
+          denial_reason?: string | null
+          duration_days: number
+          end_date: string
+          id?: string
+          max_renewals?: number
+          operation_area?: Json | null
+          operation_description?: string | null
+          operation_locations?: string[]
+          passport_number?: string | null
+          permit_fee?: number
+          permit_type: Database["public"]["Enums"]["temporary_permit_type"]
+          purpose: string
+          registration_id: string
+          renewal_count?: number
+          required_documents?: Json
+          security_deposit?: number
+          start_date: string
+          status?: Database["public"]["Enums"]["temporary_permit_status"]
+          updated_at?: string
+        }
+        Update: {
+          applicant_email?: string
+          applicant_name?: string
+          applicant_nationality?: string | null
+          applicant_phone?: string | null
+          applicant_type?: Database["public"]["Enums"]["temporary_permit_applicant_type"]
+          approval_conditions?: string[]
+          created_at?: string
+          currency?: string
+          denial_reason?: string | null
+          duration_days?: number
+          end_date?: string
+          id?: string
+          max_renewals?: number
+          operation_area?: Json | null
+          operation_description?: string | null
+          operation_locations?: string[]
+          passport_number?: string | null
+          permit_fee?: number
+          permit_type?: Database["public"]["Enums"]["temporary_permit_type"]
+          purpose?: string
+          registration_id?: string
+          renewal_count?: number
+          required_documents?: Json
+          security_deposit?: number
+          start_date?: string
+          status?: Database["public"]["Enums"]["temporary_permit_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "temporary_permits_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "drone_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           country_name: string
@@ -888,6 +1628,54 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      usage_records: {
+        Row: {
+          id: string
+          metric: Database["public"]["Enums"]["usage_metric"]
+          period_end: string
+          period_start: string
+          quantity: number
+          recorded_at: string
+          subscription_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          id?: string
+          metric: Database["public"]["Enums"]["usage_metric"]
+          period_end: string
+          period_start: string
+          quantity?: number
+          recorded_at?: string
+          subscription_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          id?: string
+          metric?: Database["public"]["Enums"]["usage_metric"]
+          period_end?: string
+          period_start?: string
+          quantity?: number
+          recorded_at?: string
+          subscription_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_records_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usage_records_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -993,11 +1781,49 @@ export type Database = {
       get_user_tenant_id: { Args: never; Returns: string }
     }
     Enums: {
+      billing_cycle: "monthly" | "annual"
+      disbursement_method: "wire_transfer" | "ach" | "eft" | "mobile_money"
+      disbursement_status: "pending" | "processing" | "completed" | "failed"
+      gov_revenue_category:
+        | "registration"
+        | "authorization"
+        | "certification"
+        | "penalty"
+        | "exam"
+      invoice_status:
+        | "draft"
+        | "issued"
+        | "paid"
+        | "partially_paid"
+        | "overdue"
+        | "void"
+        | "refunded"
+      line_item_category:
+        | "subscription"
+        | "registration"
+        | "authorization"
+        | "api_usage"
+        | "addon"
+        | "government_fee"
+        | "penalty"
+      mobile_money_provider:
+        | "mpesa"
+        | "mtn_momo"
+        | "airtel_money"
+        | "orange_money"
+      payment_method_type:
+        | "credit_card"
+        | "bank_transfer"
+        | "mobile_money"
+        | "paypal"
+        | "wire_transfer"
+        | "invoice"
       persona_type:
         | "individual_pilot"
         | "enterprise_manager"
         | "agency_representative"
         | "developer"
+      plan_tier: "free" | "pro" | "enterprise" | "agency" | "developer"
       region_code:
         | "US"
         | "CA"
@@ -1011,6 +1837,57 @@ export type Database = {
         | "SN"
         | "CI"
         | "UG"
+      registration_status:
+        | "pending_payment"
+        | "pending_review"
+        | "active"
+        | "expired"
+        | "suspended"
+        | "revoked"
+        | "transferred"
+      registration_type:
+        | "standard"
+        | "commercial"
+        | "government"
+        | "educational"
+        | "temporary"
+      revenue_recipient: "platform" | "government"
+      subscription_status:
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "paused"
+        | "cancelled"
+        | "expired"
+      temporary_permit_applicant_type:
+        | "tourist"
+        | "researcher"
+        | "commercial_visitor"
+        | "event_organizer"
+        | "ngo"
+        | "media"
+      temporary_permit_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "approved"
+        | "denied"
+        | "active"
+        | "expired"
+        | "revoked"
+      temporary_permit_type:
+        | "tourist"
+        | "researcher"
+        | "temporary_operator"
+        | "event"
+      usage_metric:
+        | "api_calls"
+        | "missions"
+        | "flight_hours"
+        | "authorizations"
+        | "storage_gb"
+        | "drones_registered"
+        | "active_pilots"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1138,12 +2015,55 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      billing_cycle: ["monthly", "annual"],
+      disbursement_method: ["wire_transfer", "ach", "eft", "mobile_money"],
+      disbursement_status: ["pending", "processing", "completed", "failed"],
+      gov_revenue_category: [
+        "registration",
+        "authorization",
+        "certification",
+        "penalty",
+        "exam",
+      ],
+      invoice_status: [
+        "draft",
+        "issued",
+        "paid",
+        "partially_paid",
+        "overdue",
+        "void",
+        "refunded",
+      ],
+      line_item_category: [
+        "subscription",
+        "registration",
+        "authorization",
+        "api_usage",
+        "addon",
+        "government_fee",
+        "penalty",
+      ],
+      mobile_money_provider: [
+        "mpesa",
+        "mtn_momo",
+        "airtel_money",
+        "orange_money",
+      ],
+      payment_method_type: [
+        "credit_card",
+        "bank_transfer",
+        "mobile_money",
+        "paypal",
+        "wire_transfer",
+        "invoice",
+      ],
       persona_type: [
         "individual_pilot",
         "enterprise_manager",
         "agency_representative",
         "developer",
       ],
+      plan_tier: ["free", "pro", "enterprise", "agency", "developer"],
       region_code: [
         "US",
         "CA",
@@ -1157,6 +2077,64 @@ export const Constants = {
         "SN",
         "CI",
         "UG",
+      ],
+      registration_status: [
+        "pending_payment",
+        "pending_review",
+        "active",
+        "expired",
+        "suspended",
+        "revoked",
+        "transferred",
+      ],
+      registration_type: [
+        "standard",
+        "commercial",
+        "government",
+        "educational",
+        "temporary",
+      ],
+      revenue_recipient: ["platform", "government"],
+      subscription_status: [
+        "trialing",
+        "active",
+        "past_due",
+        "paused",
+        "cancelled",
+        "expired",
+      ],
+      temporary_permit_applicant_type: [
+        "tourist",
+        "researcher",
+        "commercial_visitor",
+        "event_organizer",
+        "ngo",
+        "media",
+      ],
+      temporary_permit_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "denied",
+        "active",
+        "expired",
+        "revoked",
+      ],
+      temporary_permit_type: [
+        "tourist",
+        "researcher",
+        "temporary_operator",
+        "event",
+      ],
+      usage_metric: [
+        "api_calls",
+        "missions",
+        "flight_hours",
+        "authorizations",
+        "storage_gb",
+        "drones_registered",
+        "active_pilots",
       ],
     },
   },
