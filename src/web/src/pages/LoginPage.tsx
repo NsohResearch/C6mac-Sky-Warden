@@ -35,7 +35,7 @@ export function LoginPage() {
 
       setAuth(result.data.user, result.data.tokens);
       toast.success('Welcome back!');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.code === 'MFA_REQUIRED') {

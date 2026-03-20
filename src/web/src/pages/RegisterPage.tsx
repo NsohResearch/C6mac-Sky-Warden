@@ -40,7 +40,7 @@ export function RegisterPage() {
 
       setAuth(result.data.user, result.data.tokens);
       toast.success('Account created! Welcome to C6macEye.');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       if (error instanceof ApiError) {
         toast.error(error.message);

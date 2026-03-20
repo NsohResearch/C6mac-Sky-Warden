@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Map, Shield, Plane, Radio, BarChart3,
   Settings, LogOut, Menu, X, ChevronDown, Bell,
   Building2, Code2, Users, FileCheck, AlertTriangle,
-  ClipboardCheck, CreditCard, Landmark,
+  ClipboardCheck, CreditCard, Landmark, Palette,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -19,18 +19,19 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-  { label: 'Airspace Map', path: '/airspace', icon: <Map size={20} /> },
-  { label: 'LAANC Authorization', path: '/laanc', icon: <Shield size={20} /> },
-  { label: 'Missions', path: '/missions', icon: <Plane size={20} /> },
-  { label: 'Fleet', path: '/fleet', icon: <Radio size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
-  { label: 'Registration', path: '/registration', icon: <ClipboardCheck size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
-  { label: 'Compliance', path: '/compliance', icon: <FileCheck size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
-  { label: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
-  { label: 'Agency Rules', path: '/agency', icon: <Building2 size={20} />, personas: ['agency_representative'] },
-  { label: 'Government Revenue', path: '/government-revenue', icon: <Landmark size={20} />, personas: ['agency_representative'] },
-  { label: 'Developer Portal', path: '/developer', icon: <Code2 size={20} />, personas: ['developer'] },
-  { label: 'Billing', path: '/billing', icon: <CreditCard size={20} /> },
-  { label: 'Team', path: '/settings', icon: <Users size={20} />, personas: ['enterprise_manager'] },
+  { label: 'Airspace Map', path: '/dashboard/airspace', icon: <Map size={20} /> },
+  { label: 'LAANC Authorization', path: '/dashboard/laanc', icon: <Shield size={20} /> },
+  { label: 'Missions', path: '/dashboard/missions', icon: <Plane size={20} /> },
+  { label: 'Fleet', path: '/dashboard/fleet', icon: <Radio size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
+  { label: 'Registration', path: '/dashboard/registration', icon: <ClipboardCheck size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
+  { label: 'Compliance', path: '/dashboard/compliance', icon: <FileCheck size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
+  { label: 'Analytics', path: '/dashboard/analytics', icon: <BarChart3 size={20} /> },
+  { label: 'Agency Rules', path: '/dashboard/agency', icon: <Building2 size={20} />, personas: ['agency_representative'] },
+  { label: 'Government Revenue', path: '/dashboard/government-revenue', icon: <Landmark size={20} />, personas: ['agency_representative'] },
+  { label: 'Developer Portal', path: '/dashboard/developer', icon: <Code2 size={20} />, personas: ['developer'] },
+  { label: 'White Label', path: '/dashboard/whitelabel', icon: <Palette size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
+  { label: 'Billing', path: '/dashboard/billing', icon: <CreditCard size={20} /> },
+  { label: 'Team', path: '/dashboard/settings', icon: <Users size={20} />, personas: ['enterprise_manager'] },
 ];
 
 export function DashboardLayout() {

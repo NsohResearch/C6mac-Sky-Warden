@@ -21,6 +21,12 @@ import { PricingPage } from './pages/PricingPage';
 import { BillingPage } from './pages/BillingPage';
 import { DroneRegistrationPage } from './pages/DroneRegistrationPage';
 import { GovernmentRevenuePage } from './pages/GovernmentRevenuePage';
+import { WhiteLabelPage } from './pages/WhiteLabelPage';
+
+// Public marketing pages
+import { LandingPage } from './pages/LandingPage';
+import { IndustriesPage } from './pages/IndustriesPage';
+import { ResourceHubPage } from './pages/ResourceHubPage';
 
 // Persona-specific pages
 import { PilotDashboard } from './pages/pilot/PilotDashboard';
@@ -53,14 +59,17 @@ function PersonaRedirect() {
 export default function App() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public marketing routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/industries" element={<IndustriesPage />} />
+      <Route path="/resources" element={<ResourceHubPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
 
       {/* Protected routes */}
       <Route
-        path="/"
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <DashboardLayout />
@@ -68,7 +77,6 @@ export default function App() {
         }
       >
         <Route index element={<PersonaRedirect />} />
-        <Route path="dashboard" element={<PersonaRedirect />} />
         <Route path="airspace" element={<AirspaceMapPage />} />
         <Route path="laanc" element={<LaancPage />} />
         <Route path="missions" element={<MissionsPage />} />
@@ -78,6 +86,7 @@ export default function App() {
         <Route path="billing" element={<BillingPage />} />
         <Route path="registration" element={<DroneRegistrationPage />} />
         <Route path="government-revenue" element={<GovernmentRevenuePage />} />
+        <Route path="whitelabel" element={<WhiteLabelPage />} />
         <Route path="settings" element={<SettingsPage />} />
 
         {/* Persona-specific sub-routes */}

@@ -11,3 +11,5 @@ export * from './agency';
 export * from './developer';
 export * from './billing';
 export * from './common';
+export * from './whitelabel';
+export * from './flightplan';
