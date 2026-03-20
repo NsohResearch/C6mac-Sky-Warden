@@ -25,6 +25,7 @@ import DroneRegistrationPage from "@/pages/DroneRegistrationPage";
 import GovernmentRevenuePage from "@/pages/GovernmentRevenuePage";
 import SafetyReports from "@/pages/SafetyReports";
 import B4UFly from "@/pages/B4UFly";
+import LiveTelemetry from "@/pages/LiveTelemetry";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
