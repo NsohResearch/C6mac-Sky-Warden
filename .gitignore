@@ -46,6 +46,12 @@ service-account.json
 # Docker
 docker-compose.override.yml
 
+# Claude Code
+.claude/
+
+# Downloaded archives
+*.zip
+
 # Misc
 .cache/
 .temp/
