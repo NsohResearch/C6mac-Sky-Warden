@@ -22,6 +22,7 @@ import {
   Route,
   ShieldAlert,
   Radar,
+  Satellite,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
@@ -29,6 +30,7 @@ import logoMark from "@/assets/logo-mark.png";
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "Airspace", icon: Map, path: "/airspace" },
+  { label: "Live Telemetry", icon: Satellite, path: "/live-telemetry" },
   { label: "Fleet", icon: Plane, path: "/fleet" },
   { label: "Missions", icon: Navigation, path: "/missions" },
   { label: "Flight Plans", icon: Route, path: "/flight-plans" },

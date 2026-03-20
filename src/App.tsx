@@ -25,6 +25,8 @@ import DroneRegistrationPage from "@/pages/DroneRegistrationPage";
 import GovernmentRevenuePage from "@/pages/GovernmentRevenuePage";
 import SafetyReports from "@/pages/SafetyReports";
 import B4UFly from "@/pages/B4UFly";
+import LiveTelemetry from "@/pages/LiveTelemetry";
+import InstallApp from "@/pages/InstallApp";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -48,10 +50,12 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Navigate to="/login" replace />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/install" element={<InstallApp />} />
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/airspace" element={<Airspace />} />
+              <Route path="/live-telemetry" element={<LiveTelemetry />} />
               <Route path="/fleet" element={<Fleet />} />
               <Route path="/missions" element={<Missions />} />
               <Route path="/flight-plans" element={<FlightPlans />} />
