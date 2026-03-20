@@ -27,6 +27,7 @@ import SafetyReports from "@/pages/SafetyReports";
 import B4UFly from "@/pages/B4UFly";
 import LiveTelemetry from "@/pages/LiveTelemetry";
 import Weather from "@/pages/Weather";
+import PilotLogbook from "@/pages/PilotLogbook";
 import InstallApp from "@/pages/InstallApp";
 import NotFound from "@/pages/NotFound";
 
