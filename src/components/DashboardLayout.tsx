@@ -23,6 +23,8 @@ import {
   ShieldAlert,
   Radar,
   Satellite,
+  Cloud,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
