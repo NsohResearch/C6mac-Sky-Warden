@@ -84,7 +84,7 @@ export default function FlightPlans() {
       }));
 
       const { error } = await supabase.from('missions').insert({
-        tenant_id: profile!.tenant_id,
+        tenant_id: profile!.tenant_id as string,
         region: region,
         title: planName,
         mission_type: flightRules === 'IFR' ? 'instrument' : 'visual',
