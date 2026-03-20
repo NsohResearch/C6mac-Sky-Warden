@@ -15,6 +15,11 @@ import {
   LogOut,
   User,
   Radio,
+  CreditCard,
+  FileText,
+  Landmark,
+  Paintbrush,
+  Route,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
@@ -24,11 +29,14 @@ const navItems = [
   { label: "Airspace", icon: Map, path: "/airspace" },
   { label: "Fleet", icon: Plane, path: "/fleet" },
   { label: "Missions", icon: Navigation, path: "/missions" },
-  { label: "Flight Plans", icon: Navigation, path: "/flight-plans" },
+  { label: "Flight Plans", icon: Route, path: "/flight-plans" },
+  { label: "Registration", icon: FileText, path: "/registration" },
   { label: "LAANC", icon: Shield, path: "/laanc" },
   { label: "Remote ID", icon: Radio, path: "/remote-id" },
+  { label: "Billing", icon: CreditCard, path: "/billing" },
+  { label: "Gov Revenue", icon: Landmark, path: "/government-revenue" },
   { label: "Analytics", icon: BarChart3, path: "/analytics" },
-  { label: "White-Label", icon: Settings, path: "/white-label" },
+  { label: "White-Label", icon: Paintbrush, path: "/white-label" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
 
