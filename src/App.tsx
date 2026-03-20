@@ -19,6 +19,10 @@ import RemoteId from "@/pages/RemoteId";
 import Analytics from "@/pages/Analytics";
 import SettingsPage from "@/pages/SettingsPage";
 import WhiteLabelSettings from "@/pages/WhiteLabelSettings";
+import PricingPage from "@/pages/PricingPage";
+import BillingPage from "@/pages/BillingPage";
+import DroneRegistrationPage from "@/pages/DroneRegistrationPage";
+import GovernmentRevenuePage from "@/pages/GovernmentRevenuePage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -41,6 +45,7 @@ const App = () => (
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Navigate to="/login" replace />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -51,8 +56,11 @@ const App = () => (
               <Route path="/laanc" element={<LaancAuth />} />
               <Route path="/remote-id" element={<RemoteId />} />
               <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/registration" element={<DroneRegistrationPage />} />
+              <Route path="/billing" element={<BillingPage />} />
+              <Route path="/government-revenue" element={<GovernmentRevenuePage />} />
               <Route path="/white-label" element={<WhiteLabelSettings />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
