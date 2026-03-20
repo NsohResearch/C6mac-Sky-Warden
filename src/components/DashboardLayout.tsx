@@ -126,10 +126,7 @@ export default function DashboardLayout() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="relative p-2 rounded-md hover:bg-muted transition-colors active:scale-[0.96]">
-              <Bell className="w-[18px] h-[18px] text-muted-foreground" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full animate-pulse-dot" />
-            </button>
+            <NotificationCenter />
             <div className="w-px h-6 bg-border mx-1" />
             <button
               onClick={handleSignOut}
