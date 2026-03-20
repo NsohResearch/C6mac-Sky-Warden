@@ -110,12 +110,20 @@ export default function DashboardLayout() {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full animate-pulse-dot" />
             </button>
             <div className="w-px h-6 bg-border mx-1" />
-            <button className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted transition-colors active:scale-[0.97]">
+            <button
+              onClick={handleSignOut}
+              className="p-2 rounded-md hover:bg-muted transition-colors active:scale-[0.96]"
+              title="Sign out"
+            >
+              <LogOut className="w-[18px] h-[18px] text-muted-foreground" />
+            </button>
+            <div className="w-px h-6 bg-border mx-1" />
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-md">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                 <User className="w-3.5 h-3.5 text-primary-foreground" />
               </div>
-              <span className="text-sm font-medium text-foreground">Pilot</span>
-            </button>
+              <span className="text-sm font-medium text-foreground">{profile?.display_name ?? "Pilot"}</span>
+            </div>
           </div>
         </header>
 
