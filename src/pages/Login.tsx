@@ -52,7 +52,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="pilot@c6maceye.com"
+                placeholder="pilot@skywarden.io"
                 className="w-full h-10 rounded-md bg-background border border-input px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring/30 focus:border-accent transition-shadow"
               />
             </div>
