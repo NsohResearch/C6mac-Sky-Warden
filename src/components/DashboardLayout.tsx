@@ -22,6 +22,7 @@ import {
   Route,
   ShieldAlert,
   Radar,
+  Satellite,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
