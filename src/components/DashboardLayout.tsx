@@ -24,9 +24,11 @@ const navItems = [
   { label: "Airspace", icon: Map, path: "/airspace" },
   { label: "Fleet", icon: Plane, path: "/fleet" },
   { label: "Missions", icon: Navigation, path: "/missions" },
+  { label: "Flight Plans", icon: Navigation, path: "/flight-plans" },
   { label: "LAANC", icon: Shield, path: "/laanc" },
   { label: "Remote ID", icon: Radio, path: "/remote-id" },
   { label: "Analytics", icon: BarChart3, path: "/analytics" },
+  { label: "White-Label", icon: Settings, path: "/white-label" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
 
