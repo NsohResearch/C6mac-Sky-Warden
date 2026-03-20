@@ -41,6 +41,8 @@ const navItems = [
   { label: "Remote ID", icon: Radio, path: "/remote-id" },
   { label: "Safety (ASRP)", icon: ShieldAlert, path: "/safety-reports" },
   { label: "B4UFLY", icon: Radar, path: "/b4ufly" },
+  { label: "Weather", icon: Cloud, path: "/weather" },
+  { label: "Pilot Logbook", icon: BookOpen, path: "/pilot-logbook" },
   { label: "Billing", icon: CreditCard, path: "/billing" },
   { label: "Gov Revenue", icon: Landmark, path: "/government-revenue" },
   { label: "Analytics", icon: BarChart3, path: "/analytics" },
