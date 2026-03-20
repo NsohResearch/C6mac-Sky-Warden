@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Map,
@@ -16,6 +16,7 @@ import {
   User,
   Radio,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
 
 const navItems = [
