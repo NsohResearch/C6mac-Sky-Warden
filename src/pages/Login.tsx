@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowRight, Globe, Plane, Building2, Shield, Code2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -6,6 +6,13 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { t, getBrowserLang, languages, type Lang } from "@/lib/i18n";
 import CookieConsent from "@/components/CookieConsent";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import logoMark from "@/assets/logo-mark.png";
 
 type Persona = "individual_pilot" | "enterprise_manager" | "agency_representative" | "developer";
@@ -19,6 +26,7 @@ const personaIcons: Record<Persona, typeof Plane> = {
 };
 
 const personaKeys: Persona[] = ["individual_pilot", "enterprise_manager", "agency_representative", "developer"];
+const LEGAL_ACCEPTANCE_KEY = "skw_legal_acceptance_v1";
 
 const regions = [
   { value: "US", label: "United States" },
@@ -42,30 +50,57 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [legalAccepted, setLegalAccepted] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false);
 
   // Sign-up extra fields
   const [displayName, setDisplayName] = useState("");
   const [persona, setPersona] = useState<Persona>("individual_pilot");
   const [region, setRegion] = useState("US");
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, profile, loading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const accepted = localStorage.getItem(LEGAL_ACCEPTANCE_KEY) === "accepted";
+    setLegalAccepted(accepted);
+    setLegalOpen(!accepted);
+  }, []);
+
+  useEffect(() => {
+    if (loading || !user) return;
+
+    navigate(profile?.onboarding_completed === false ? "/onboarding" : "/dashboard", { replace: true });
+  }, [loading, navigate, profile?.onboarding_completed, user]);
+
+  const handleLegalAcceptance = () => {
+    localStorage.setItem(LEGAL_ACCEPTANCE_KEY, "accepted");
+    setLegalAccepted(true);
+    setLegalOpen(false);
+  };
+
+  const handleLegalDecline = () => {
+    localStorage.removeItem(LEGAL_ACCEPTANCE_KEY);
+    setLegalAccepted(false);
+    setLegalOpen(false);
+    navigate("/", { replace: true });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!termsAccepted) {
+    if (!legalAccepted) {
+      setLegalOpen(true);
       toast.error(tab === "signin" ? "Please accept the Terms of Service" : "Please accept the Terms of Service to create an account");
       return;
     }
+
     setSubmitting(true);
 
     if (tab === "signin") {
       const { error } = await signIn(email, password);
       setSubmitting(false);
       if (error) toast.error(error.message);
-      else navigate("/dashboard");
     } else {
       const { error } = await signUp(email, password, {
         display_name: displayName,
@@ -83,12 +118,14 @@ export default function Login() {
   };
 
   const handleGoogle = async () => {
-    if (!termsAccepted) {
+    if (!legalAccepted) {
+      setLegalOpen(true);
       toast.error("Please accept the Terms of Service");
       return;
     }
+
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}/login`,
     });
     if (error) toast.error(error.message);
   };
@@ -104,6 +141,48 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background via-background to-secondary/30 p-4 sm:p-6">
+      <Dialog open={legalOpen}>
+        <DialogContent className="max-w-xl border-border bg-card p-0 sm:rounded-2xl [&>button]:hidden">
+          <div className="max-h-[85vh] overflow-y-auto p-6 sm:p-8">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-2xl leading-tight text-foreground">{t(lang, "legalTitle")}</DialogTitle>
+              <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
+                {t(lang, "legalIntro")}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-6 space-y-4 text-sm leading-relaxed text-muted-foreground">
+              <section className="rounded-xl border border-border bg-background p-4">
+                <h2 className="text-sm font-semibold text-foreground">{t(lang, "legalTermsHeading")}</h2>
+                <p className="mt-2">{t(lang, "legalTermsBody")}</p>
+              </section>
+
+              <section className="rounded-xl border border-border bg-background p-4">
+                <h2 className="text-sm font-semibold text-foreground">{t(lang, "legalPrivacyHeading")}</h2>
+                <p className="mt-2">{t(lang, "legalPrivacyBody")}</p>
+              </section>
+            </div>
+
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={handleLegalDecline}
+                className="h-11 rounded-lg border border-border px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+              >
+                {t(lang, "legalDecline")}
+              </button>
+              <button
+                type="button"
+                onClick={handleLegalAcceptance}
+                className="h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-accent-foreground shadow-sm transition-opacity hover:opacity-90 active:scale-[0.98]"
+              >
+                {t(lang, "legalContinue")}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Language selector */}
       <div className="fixed top-4 right-4 z-40 relative">
         <button
@@ -129,7 +208,7 @@ export default function Login() {
         )}
       </div>
 
-      <div className="w-full max-w-[420px] animate-reveal-up">
+      <div className={`w-full max-w-[420px] animate-reveal-up transition-all duration-300 ${legalAccepted ? "opacity-100" : "pointer-events-none opacity-0 scale-[0.98]"}`}>
         <div className="bg-card border border-border rounded-2xl shadow-xl shadow-primary/5 p-6 sm:p-8">
           {/* Logo */}
           <div className="flex justify-center mb-5">
@@ -289,21 +368,9 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Terms & Privacy */}
-            <label className="flex items-start gap-2 cursor-pointer select-none pt-1">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-border text-accent focus:ring-accent/30 accent-[hsl(var(--accent))]"
-              />
-              <span className="text-[11px] text-muted-foreground leading-relaxed">
-                {t(lang, "termsAgree")}{" "}
-                <a href="/terms" className="text-accent hover:underline font-medium">{t(lang, "termsOfService")}</a>
-                {" "}{t(lang, "and")}{" "}
-                <a href="/privacy" className="text-accent hover:underline font-medium">{t(lang, "privacyPolicy")}</a>
-              </span>
-            </label>
+            <div className="rounded-lg border border-border bg-background px-3 py-2.5 text-[11px] leading-relaxed text-muted-foreground">
+              {t(lang, "legalAcceptedNote")}
+            </div>
 
             <button
               type="submit"
