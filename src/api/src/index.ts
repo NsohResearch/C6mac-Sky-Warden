@@ -19,6 +19,8 @@ import { agencyRoutes } from './routes/agency.routes.js';
 import { developerRoutes } from './routes/developer.routes.js';
 import { complianceRoutes } from './routes/compliance.routes.js';
 import { analyticsRoutes } from './routes/analytics.routes.js';
+import { billingRoutes } from './routes/billing.routes.js';
+import { registrationRoutes } from './routes/registration.routes.js';
 
 // ─── App Setup ───
 
@@ -88,6 +90,10 @@ api.route('/analytics', analyticsRoutes);
 // Developer platform
 api.route('/developer', developerRoutes);
 
+// Sky Warden monetization
+api.route('/billing', billingRoutes);
+api.route('/registrations', registrationRoutes);
+
 // Mount versioned API
 app.route(`/api/${env.API_VERSION}`, api);
 
@@ -109,6 +115,8 @@ app.get('/api', (c) => {
       compliance: `/api/${env.API_VERSION}/compliance`,
       analytics: `/api/${env.API_VERSION}/analytics`,
       developer: `/api/${env.API_VERSION}/developer`,
+      billing: `/api/${env.API_VERSION}/billing`,
+      registrations: `/api/${env.API_VERSION}/registrations`,
     },
     personas: [
       { name: 'Individual Pilot', description: 'B4UFLY checks, LAANC auth, flight logging, Remote ID compliance' },

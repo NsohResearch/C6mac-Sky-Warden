@@ -9,4 +9,5 @@ export * from './compliance';
 export * from './analytics';
 export * from './agency';
 export * from './developer';
+export * from './billing';
 export * from './common';
