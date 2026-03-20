@@ -126,10 +126,10 @@ export default function BillingPage() {
             {paymentMethods.map((pm) => (
               <div key={pm.id} className="flex items-center gap-4 rounded-lg border border-border p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                  {pm.type === 'card' ? <CreditCard className="h-5 w-5 text-muted-foreground" /> : <Smartphone className="h-5 w-5 text-muted-foreground" />}
+                  {pm.type === 'credit_card' ? <CreditCard className="h-5 w-5 text-muted-foreground" /> : <Smartphone className="h-5 w-5 text-muted-foreground" />}
                 </div>
                 <div className="flex-1">
-                  {pm.type === 'card' ? (
+                  {pm.type === 'credit_card' ? (
                     <>
                       <p className="text-sm font-medium text-foreground capitalize">{pm.card_brand} ending in {pm.card_last4}</p>
                       <p className="text-xs text-muted-foreground">Expires {pm.card_exp_month}/{pm.card_exp_year}</p>
