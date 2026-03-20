@@ -36,39 +36,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("user_profiles")
       .select("*")
       .eq("id", userId)
-      .single();
-    setProfile(data as UserProfile | null);
+      .maybeSingle();
+
+    if (error) {
+      console.error("Failed to load user profile", error);
+      setProfile(null);
+      return null;
+    }
+
+    const nextProfile = (data as UserProfile | null) ?? null;
+    setProfile(nextProfile);
+    return nextProfile;
   }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
+        setLoading(true);
         setSession(newSession);
         setUser(newSession?.user ?? null);
+
         if (newSession?.user) {
-          // Use setTimeout to avoid Supabase client deadlock
-          setTimeout(() => fetchProfile(newSession.user.id), 0);
+          await fetchProfile(newSession.user.id);
         } else {
           setProfile(null);
         }
+
         setLoading(false);
       }
     );
 
     // THEN check existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+    void (async () => {
+      setLoading(true);
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
+
       if (existingSession?.user) {
-        fetchProfile(existingSession.user.id);
+        await fetchProfile(existingSession.user.id);
+      } else {
+        setProfile(null);
       }
+
       setLoading(false);
-    });
+    })();
 
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
