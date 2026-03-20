@@ -64,6 +64,7 @@ const App = () => (
               <Route path="/remote-id" element={<RemoteId />} />
               <Route path="/safety-reports" element={<SafetyReports />} />
               <Route path="/b4ufly" element={<B4UFly />} />
+              <Route path="/weather" element={<Weather />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/registration" element={<DroneRegistrationPage />} />
               <Route path="/billing" element={<BillingPage />} />
