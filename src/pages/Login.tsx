@@ -186,6 +186,32 @@ export default function Login() {
 
       <div className={`w-full max-w-[420px] animate-reveal-up transition-all duration-300 ${legalAccepted ? "opacity-100" : "pointer-events-none opacity-0 scale-[0.98]"}`}>
         <div className="bg-card border border-border rounded-2xl shadow-xl shadow-primary/5 p-6 sm:p-8">
+          {/* Language selector */}
+          <div className="relative mb-4">
+            <button
+              onClick={() => setLangOpen(!langOpen)}
+              className="flex items-center gap-1.5 h-8 px-2.5 rounded-md bg-muted/60 border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:border-accent/40 transition-colors"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {languages.find((l) => l.code === lang)?.flag}
+              <span className="hidden sm:inline">{languages.find((l) => l.code === lang)?.label}</span>
+            </button>
+            {langOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px] z-50 max-h-60 overflow-y-auto">
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => { setLang(l.code); setLangOpen(false); }}
+                    className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs hover:bg-muted/60 transition-colors ${lang === l.code ? "text-accent font-semibold" : "text-foreground"}`}
+                  >
+                    <span>{l.flag}</span>
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Logo */}
           <div className="flex justify-center mb-5">
             <img src={logoMark} alt="SkyWarden" className="w-16 h-16 rounded-2xl shadow-md" />
