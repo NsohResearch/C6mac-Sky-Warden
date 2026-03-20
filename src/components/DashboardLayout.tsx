@@ -20,6 +20,8 @@ import {
   Landmark,
   Paintbrush,
   Route,
+  ShieldAlert,
+  Radar,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import logoMark from "@/assets/logo-mark.png";
@@ -33,6 +35,8 @@ const navItems = [
   { label: "Registration", icon: FileText, path: "/registration" },
   { label: "LAANC", icon: Shield, path: "/laanc" },
   { label: "Remote ID", icon: Radio, path: "/remote-id" },
+  { label: "Safety (ASRP)", icon: ShieldAlert, path: "/safety-reports" },
+  { label: "B4UFLY", icon: Radar, path: "/b4ufly" },
   { label: "Billing", icon: CreditCard, path: "/billing" },
   { label: "Gov Revenue", icon: Landmark, path: "/government-revenue" },
   { label: "Analytics", icon: BarChart3, path: "/analytics" },

@@ -277,6 +277,87 @@ export type Database = {
           },
         ]
       }
+      b4ufly_checks: {
+        Row: {
+          airport_count: number | null
+          altitude_ft: number | null
+          check_radius_nm: number | null
+          check_results: Json
+          checked_at: string
+          id: string
+          laanc_available: boolean | null
+          latitude: number
+          longitude: number
+          national_park_nearby: boolean | null
+          notam_count: number | null
+          overall_advisory: Database["public"]["Enums"]["b4ufly_advisory_level"]
+          region: Database["public"]["Enums"]["region_code"]
+          stadium_nearby: boolean | null
+          sua_count: number | null
+          tenant_id: string
+          tfr_count: number | null
+          uasfm_ceiling_ft: number | null
+          user_id: string | null
+        }
+        Insert: {
+          airport_count?: number | null
+          altitude_ft?: number | null
+          check_radius_nm?: number | null
+          check_results?: Json
+          checked_at?: string
+          id?: string
+          laanc_available?: boolean | null
+          latitude: number
+          longitude: number
+          national_park_nearby?: boolean | null
+          notam_count?: number | null
+          overall_advisory?: Database["public"]["Enums"]["b4ufly_advisory_level"]
+          region?: Database["public"]["Enums"]["region_code"]
+          stadium_nearby?: boolean | null
+          sua_count?: number | null
+          tenant_id: string
+          tfr_count?: number | null
+          uasfm_ceiling_ft?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          airport_count?: number | null
+          altitude_ft?: number | null
+          check_radius_nm?: number | null
+          check_results?: Json
+          checked_at?: string
+          id?: string
+          laanc_available?: boolean | null
+          latitude?: number
+          longitude?: number
+          national_park_nearby?: boolean | null
+          notam_count?: number | null
+          overall_advisory?: Database["public"]["Enums"]["b4ufly_advisory_level"]
+          region?: Database["public"]["Enums"]["region_code"]
+          stadium_nearby?: boolean | null
+          sua_count?: number | null
+          tenant_id?: string
+          tfr_count?: number | null
+          uasfm_ceiling_ft?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "b4ufly_checks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "b4ufly_checks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drone_registrations: {
         Row: {
           auto_renew: boolean
@@ -1370,6 +1451,81 @@ export type Database = {
           },
         ]
       }
+      remote_id_compliance: {
+        Row: {
+          altitude_accuracy_ft: number | null
+          broadcast_performance_pass: boolean | null
+          broadcast_rate_hz: number | null
+          compliance_type: Database["public"]["Enums"]["rid_compliance_type"]
+          created_at: string
+          drone_id: string
+          id: string
+          is_compliant: boolean | null
+          last_verified_at: string | null
+          latency_seconds: number | null
+          next_verification_due: string | null
+          position_accuracy_ft: number | null
+          serial_format: string | null
+          serial_number_valid: boolean | null
+          tenant_id: string
+          updated_at: string
+          verification_notes: string | null
+        }
+        Insert: {
+          altitude_accuracy_ft?: number | null
+          broadcast_performance_pass?: boolean | null
+          broadcast_rate_hz?: number | null
+          compliance_type?: Database["public"]["Enums"]["rid_compliance_type"]
+          created_at?: string
+          drone_id: string
+          id?: string
+          is_compliant?: boolean | null
+          last_verified_at?: string | null
+          latency_seconds?: number | null
+          next_verification_due?: string | null
+          position_accuracy_ft?: number | null
+          serial_format?: string | null
+          serial_number_valid?: boolean | null
+          tenant_id: string
+          updated_at?: string
+          verification_notes?: string | null
+        }
+        Update: {
+          altitude_accuracy_ft?: number | null
+          broadcast_performance_pass?: boolean | null
+          broadcast_rate_hz?: number | null
+          compliance_type?: Database["public"]["Enums"]["rid_compliance_type"]
+          created_at?: string
+          drone_id?: string
+          id?: string
+          is_compliant?: boolean | null
+          last_verified_at?: string | null
+          latency_seconds?: number | null
+          next_verification_due?: string | null
+          position_accuracy_ft?: number | null
+          serial_format?: string | null
+          serial_number_valid?: boolean | null
+          tenant_id?: string
+          updated_at?: string
+          verification_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_id_compliance_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "remote_id_compliance_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       roles: {
         Row: {
           created_at: string | null
@@ -1398,6 +1554,144 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "roles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      safety_reports: {
+        Row: {
+          airspace_violation: boolean | null
+          assigned_to: string | null
+          attachments: Json | null
+          corrective_actions: string | null
+          created_at: string
+          description: string | null
+          drone_id: string | null
+          enforcement_protection: boolean | null
+          filing_deadline: string | null
+          id: string
+          incident_date: string
+          injury_severity: string | null
+          investigation_closed_at: string | null
+          investigation_notes: Json | null
+          investigation_started_at: string | null
+          involves_injury: boolean | null
+          lessons_learned: string | null
+          location_coords: Json | null
+          location_description: string | null
+          mission_id: string | null
+          nasa_6_conditions_met: boolean | null
+          nasa_asrs_number: string | null
+          property_damage_usd: number | null
+          region: Database["public"]["Enums"]["region_code"]
+          report_type: Database["public"]["Enums"]["safety_report_type"]
+          reporter_id: string | null
+          root_cause: string | null
+          status: Database["public"]["Enums"]["safety_report_status"]
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          airspace_violation?: boolean | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          corrective_actions?: string | null
+          created_at?: string
+          description?: string | null
+          drone_id?: string | null
+          enforcement_protection?: boolean | null
+          filing_deadline?: string | null
+          id?: string
+          incident_date: string
+          injury_severity?: string | null
+          investigation_closed_at?: string | null
+          investigation_notes?: Json | null
+          investigation_started_at?: string | null
+          involves_injury?: boolean | null
+          lessons_learned?: string | null
+          location_coords?: Json | null
+          location_description?: string | null
+          mission_id?: string | null
+          nasa_6_conditions_met?: boolean | null
+          nasa_asrs_number?: string | null
+          property_damage_usd?: number | null
+          region?: Database["public"]["Enums"]["region_code"]
+          report_type?: Database["public"]["Enums"]["safety_report_type"]
+          reporter_id?: string | null
+          root_cause?: string | null
+          status?: Database["public"]["Enums"]["safety_report_status"]
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          airspace_violation?: boolean | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          corrective_actions?: string | null
+          created_at?: string
+          description?: string | null
+          drone_id?: string | null
+          enforcement_protection?: boolean | null
+          filing_deadline?: string | null
+          id?: string
+          incident_date?: string
+          injury_severity?: string | null
+          investigation_closed_at?: string | null
+          investigation_notes?: Json | null
+          investigation_started_at?: string | null
+          involves_injury?: boolean | null
+          lessons_learned?: string | null
+          location_coords?: Json | null
+          location_description?: string | null
+          mission_id?: string | null
+          nasa_6_conditions_met?: boolean | null
+          nasa_asrs_number?: string | null
+          property_damage_usd?: number | null
+          region?: Database["public"]["Enums"]["region_code"]
+          report_type?: Database["public"]["Enums"]["safety_report_type"]
+          reporter_id?: string | null
+          root_cause?: string | null
+          status?: Database["public"]["Enums"]["safety_report_status"]
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "safety_reports_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "safety_reports_drone_id_fkey"
+            columns: ["drone_id"]
+            isOneToOne: false
+            referencedRelation: "drones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "safety_reports_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "safety_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "safety_reports_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1781,6 +2075,7 @@ export type Database = {
       get_user_tenant_id: { Args: never; Returns: string }
     }
     Enums: {
+      b4ufly_advisory_level: "green" | "yellow" | "red"
       billing_cycle: "monthly" | "annual"
       disbursement_method: "wire_transfer" | "ach" | "eft" | "mobile_money"
       disbursement_status: "pending" | "processing" | "completed" | "failed"
@@ -1852,6 +2147,14 @@ export type Database = {
         | "educational"
         | "temporary"
       revenue_recipient: "platform" | "government"
+      rid_compliance_type: "standard_rid" | "broadcast_module" | "fria"
+      safety_report_status:
+        | "draft"
+        | "submitted"
+        | "under_investigation"
+        | "closed"
+        | "overdue"
+      safety_report_type: "mandatory" | "voluntary_nasa_asrs"
       subscription_status:
         | "trialing"
         | "active"
@@ -2015,6 +2318,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      b4ufly_advisory_level: ["green", "yellow", "red"],
       billing_cycle: ["monthly", "annual"],
       disbursement_method: ["wire_transfer", "ach", "eft", "mobile_money"],
       disbursement_status: ["pending", "processing", "completed", "failed"],
@@ -2095,6 +2399,15 @@ export const Constants = {
         "temporary",
       ],
       revenue_recipient: ["platform", "government"],
+      rid_compliance_type: ["standard_rid", "broadcast_module", "fria"],
+      safety_report_status: [
+        "draft",
+        "submitted",
+        "under_investigation",
+        "closed",
+        "overdue",
+      ],
+      safety_report_type: ["mandatory", "voluntary_nasa_asrs"],
       subscription_status: [
         "trialing",
         "active",
