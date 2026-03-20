@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import logoMark from "@/assets/logo-mark.png";
 import heroAirspace from "@/assets/hero-airspace.jpg";
