@@ -1,82 +1,141 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import {
-  Plane,
-  Navigation,
-  Shield,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  TrendingUp,
-  MapPin,
+  Plane, Navigation, Shield, AlertTriangle, TrendingUp, MapPin,
 } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
-
-const flightData = [
-  { date: "Mar 1", flights: 12 },
-  { date: "Mar 5", flights: 18 },
-  { date: "Mar 8", flights: 7 },
-  { date: "Mar 12", flights: 24 },
-  { date: "Mar 15", flights: 31 },
-  { date: "Mar 17", flights: 19 },
-  { date: "Mar 20", flights: 27 },
-];
-
-const recentMissions = [
-  { id: "MSN-2847", location: "Downtown Corridor", status: "active" as const, pilot: "R. Vasquez", altitude: "280 ft AGL", time: "12 min ago" },
-  { id: "MSN-2846", location: "Harbor District", status: "approved" as const, pilot: "T. Chen", altitude: "400 ft AGL", time: "1 hr ago" },
-  { id: "MSN-2845", location: "Industrial Park E", status: "pending" as const, pilot: "M. Okafor", altitude: "150 ft AGL", time: "2 hr ago" },
-  { id: "MSN-2844", location: "Riverfront Zone", status: "active" as const, pilot: "S. Patel", altitude: "350 ft AGL", time: "3 hr ago" },
-  { id: "MSN-2843", location: "University Campus", status: "denied" as const, pilot: "L. Martinez", altitude: "200 ft AGL", time: "5 hr ago" },
-];
-
-const alerts = [
-  { type: "warning" as const, message: "TFR active near Downtown Corridor — FDC 4/2847", time: "8 min ago" },
-  { type: "info" as const, message: "UASFM updated — new grid ceilings effective Apr 3", time: "1 hr ago" },
-  { type: "error" as const, message: "Drone C6M-042 battery below 15% — RTL initiated", time: "2 hr ago" },
-];
+import { format, subDays, startOfDay } from "date-fns";
 
 export default function Dashboard() {
+  const { profile } = useAuth();
+
+  const { data: drones = [] } = useQuery({
+    queryKey: ["dashboard-drones"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("drones").select("id, status, nickname, manufacturer, model").limit(200);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: missions = [] } = useQuery({
+    queryKey: ["dashboard-missions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("missions")
+        .select("id, title, status, max_altitude_ft, created_at, description, pilot_id")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: laancAuths = [] } = useQuery({
+    queryKey: ["dashboard-laanc"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("flight_authorizations")
+        .select("id, status, created_at")
+        .limit(500);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: safetyReports = [] } = useQuery({
+    queryKey: ["dashboard-safety"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("safety_reports")
+        .select("id, title, status, filing_deadline, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Compute stats
+  const activeFlights = missions.filter((m) => m.status === "active" || m.status === "in_progress").length;
+  const totalDrones = drones.length;
+  const activeDrones = drones.filter((d) => d.status === "active").length;
+  const maintenanceDrones = drones.filter((d) => d.status === "maintenance" || d.status === "grounded").length;
+  const approvedLaanc = laancAuths.filter((a) => a.status === "approved").length;
+  const overdueReports = safetyReports.filter(
+    (r) => r.filing_deadline && new Date(r.filing_deadline) < new Date() && r.status !== "closed"
+  ).length;
+
+  // Build flight activity chart from missions created_at
+  const flightData = Array.from({ length: 7 }, (_, i) => {
+    const day = subDays(new Date(), 6 - i);
+    const dayStr = format(day, "MMM d");
+    const dayStart = startOfDay(day);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    const count = missions.filter((m) => {
+      const d = new Date(m.created_at);
+      return d >= dayStart && d < dayEnd;
+    }).length;
+    return { date: dayStr, flights: count };
+  });
+
+  const totalFlightsThisWeek = flightData.reduce((s, d) => s + d.flights, 0);
+
+  // Recent missions for table
+  const recentMissions = missions.slice(0, 5);
+
+  // Build alerts from real data
+  const alerts: { type: "warning" | "error" | "info"; message: string; time: string }[] = [];
+  if (overdueReports > 0) {
+    alerts.push({ type: "error", message: `${overdueReports} safety report(s) past 10-day filing deadline`, time: "Action required" });
+  }
+  if (maintenanceDrones > 0) {
+    alerts.push({ type: "warning", message: `${maintenanceDrones} drone(s) in maintenance`, time: "Fleet status" });
+  }
+  const pendingLaanc = laancAuths.filter((a) => a.status === "pending").length;
+  if (pendingLaanc > 0) {
+    alerts.push({ type: "info", message: `${pendingLaanc} LAANC authorization(s) pending review`, time: "Awaiting response" });
+  }
+  if (alerts.length === 0) {
+    alerts.push({ type: "info", message: "All systems operational — no active alerts", time: "Now" });
+  }
+
+  const today = format(new Date(), "MMMM d, yyyy");
+
   return (
     <div className="p-6 max-w-[1400px] mx-auto space-y-6">
-      {/* Header */}
       <div className="animate-reveal-up">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground leading-tight">
           Flight Operations
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          March 20, 2026 — All systems operational
+          {today} — {alerts[0].type === "info" && alerts.length === 1 ? "All systems operational" : `${alerts.length} alert(s)`}
         </p>
       </div>
 
-      {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Active Flights" value="7" change="+3 from yesterday" changeType="positive" icon={Navigation} delay={80} />
-        <StatCard label="Fleet Status" value="23/28" change="5 in maintenance" changeType="neutral" icon={Plane} delay={160} />
-        <StatCard label="LAANC Approvals" value="142" change="+12% this month" changeType="positive" icon={Shield} delay={240} />
-        <StatCard label="Active TFRs" value="3" change="1 new today" changeType="negative" icon={AlertTriangle} delay={320} />
+        <StatCard label="Active Flights" value={String(activeFlights)} change={`${totalFlightsThisWeek} this week`} changeType={activeFlights > 0 ? "positive" : "neutral"} icon={Navigation} delay={80} />
+        <StatCard label="Fleet Status" value={`${activeDrones}/${totalDrones}`} change={maintenanceDrones > 0 ? `${maintenanceDrones} in maintenance` : "All operational"} changeType={maintenanceDrones > 0 ? "neutral" : "positive"} icon={Plane} delay={160} />
+        <StatCard label="LAANC Approvals" value={String(approvedLaanc)} change={`${laancAuths.length} total requests`} changeType="positive" icon={Shield} delay={240} />
+        <StatCard label="Safety Reports" value={String(safetyReports.length)} change={overdueReports > 0 ? `${overdueReports} overdue` : "None overdue"} changeType={overdueReports > 0 ? "negative" : "positive"} icon={AlertTriangle} delay={320} />
       </div>
 
-      {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Flight activity chart */}
         <div className="lg:col-span-2 bg-card rounded-lg shadow-card p-5 animate-reveal-up delay-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-foreground">Flight Activity</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Flights per day — March 2026</p>
+              <h2 className="text-sm font-semibold text-foreground">Mission Activity</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Missions created — last 7 days</p>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-success font-medium tabular">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium tabular">
               <TrendingUp className="w-3.5 h-3.5" />
-              +18.4%
+              {totalFlightsThisWeek} total
             </div>
           </div>
           <div className="h-52">
@@ -84,36 +143,28 @@ export default function Dashboard() {
               <AreaChart data={flightData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="flightGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(36 95% 52%)" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="hsl(36 95% 52%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 12% 89%)" vertical={false} />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(220 8% 46%)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(220 8% 46%)" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "hsl(220 18% 14%)",
-                    border: "none",
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    color: "hsl(40 20% 95%)",
+                    color: "hsl(var(--foreground))",
                     fontSize: 12,
-                    boxShadow: "0 8px 24px -4px rgb(0 0 0 / 0.3)",
                   }}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="flights"
-                  stroke="hsl(36 95% 52%)"
-                  strokeWidth={2}
-                  fill="url(#flightGrad)"
-                />
+                <Area type="monotone" dataKey="flights" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#flightGrad)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Alerts */}
         <div className="bg-card rounded-lg shadow-card p-5 animate-reveal-up delay-5">
           <h2 className="text-sm font-semibold text-foreground mb-3">Active Alerts</h2>
           <div className="space-y-3">
@@ -138,7 +189,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent missions table */}
       <div className="bg-card rounded-lg shadow-card animate-reveal-up delay-6">
         <div className="px-5 py-4 border-b border-border">
           <h2 className="text-sm font-semibold text-foreground">Recent Missions</h2>
@@ -148,29 +198,37 @@ export default function Dashboard() {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Mission</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Location</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Pilot</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Type</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Altitude</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Status</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Time</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Created</th>
               </tr>
             </thead>
             <tbody>
-              {recentMissions.map((m) => (
-                <tr key={m.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="px-5 py-3 text-sm font-medium text-foreground mono">{m.id}</td>
-                  <td className="px-5 py-3 text-sm text-foreground flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                    {m.location}
-                  </td>
-                  <td className="px-5 py-3 text-sm text-muted-foreground">{m.pilot}</td>
-                  <td className="px-5 py-3 text-sm text-muted-foreground tabular">{m.altitude}</td>
-                  <td className="px-5 py-3">
-                    <StatusBadge status={m.status}>{m.status.charAt(0).toUpperCase() + m.status.slice(1)}</StatusBadge>
-                  </td>
-                  <td className="px-5 py-3 text-xs text-muted-foreground">{m.time}</td>
-                </tr>
-              ))}
+              {recentMissions.length === 0 ? (
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-sm text-muted-foreground">No missions yet. Create one from the Missions page.</td></tr>
+              ) : recentMissions.map((m) => {
+                const statusMap: Record<string, "active" | "approved" | "pending" | "denied" | "neutral" | "warning" | "error"> = {
+                  active: "active", in_progress: "active", draft: "neutral", completed: "approved",
+                  cancelled: "denied", pending: "pending",
+                };
+                return (
+                  <tr key={m.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td className="px-5 py-3">
+                      <div className="text-sm font-medium text-foreground">{m.title}</div>
+                      <div className="text-xs text-muted-foreground mono mt-0.5">{m.id.slice(0, 8)}</div>
+                    </td>
+                    <td className="px-5 py-3 text-sm text-muted-foreground">{m.description?.slice(0, 30) || "—"}</td>
+                    <td className="px-5 py-3 text-sm text-muted-foreground tabular">{m.max_altitude_ft ?? "—"} ft</td>
+                    <td className="px-5 py-3">
+                      <StatusBadge status={statusMap[m.status] ?? "neutral"}>
+                        {m.status.charAt(0).toUpperCase() + m.status.slice(1)}
+                      </StatusBadge>
+                    </td>
+                    <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(m.created_at).toLocaleDateString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
