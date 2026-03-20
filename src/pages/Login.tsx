@@ -33,8 +33,8 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-sm animate-reveal-up">
           <div className="flex items-center gap-3 mb-8">
-            <img src={logoMark} alt="C6macEye" className="w-10 h-10" />
-            <span className="text-xl font-semibold tracking-tight text-foreground">C6macEye</span>
+            <img src={logoMark} alt="C6mac Sky Warden" className="w-10 h-10" />
+            <span className="text-xl font-semibold tracking-tight text-foreground">Sky Warden</span>
           </div>
 
           <h1 className="text-2xl font-semibold tracking-tight text-foreground leading-tight">
