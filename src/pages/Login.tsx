@@ -216,12 +216,9 @@ export default function Login() {
           </div>
 
           {/* Heading */}
-          <h1 className="text-2xl font-bold tracking-tight text-foreground text-center leading-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground text-center leading-tight mb-6">
             {t(lang, "welcome")}
           </h1>
-          <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
-            {t(lang, "joinCommunity")}
-          </p>
 
           {/* Tabs */}
           <div className="flex rounded-lg bg-muted p-0.5 mb-6">
