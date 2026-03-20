@@ -217,7 +217,7 @@ export default function DroneRegistrationPage() {
                     <td className="px-4 py-3 text-foreground">{p.type}</td>
                     <td className="px-4 py-3"><span className="text-foreground">{p.applicant}</span><span className="ml-2 text-xs text-muted-foreground">({p.nationality})</span></td>
                     <td className="px-4 py-3 text-muted-foreground">{p.startDate} — {p.endDate}</td>
-                    <td className="px-4 py-3 text-center"><StatusBadge status={p.status === 'active' ? 'active' : p.status === 'under_review' ? 'pending' : p.status === 'expired' ? 'warning' : p.status === 'approved' ? 'approved' : p.status === 'denied' ? 'denied' : 'neutral'} /></td>
+                    <td className="px-4 py-3 text-center"><StatusBadge status={p.status === 'active' ? 'active' : p.status === 'under_review' ? 'pending' : p.status === 'expired' ? 'warning' : p.status === 'approved' ? 'approved' : p.status === 'denied' ? 'denied' : 'neutral'}>{p.status}</StatusBadge></td>
                   </tr>
                 ))}
               </tbody>
