@@ -1,7 +1,7 @@
 // SkyWarden — Multi-Region Configuration
 // Supports 12 countries across USA, Canada, and Africa
 
-export type RegionCode = 'US' | 'CA' | 'NG' | 'KE' | 'ZA' | 'GH' | 'RW' | 'TZ' | 'ET' | 'SN' | 'CI' | 'UG';
+export type RegionCode = 'US' | 'CA' | 'NG' | 'KE' | 'ZA' | 'GH' | 'RW' | 'TZ' | 'ET' | 'SN' | 'CI' | 'UG' | 'CM' | 'TD' | 'CF' | 'CG' | 'GQ' | 'GA' | 'BW' | 'ZM' | 'SS' | 'AO' | 'CD';
 
 export interface RegionConfig {
   code: RegionCode;
