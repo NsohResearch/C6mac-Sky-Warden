@@ -33,7 +33,13 @@ const navItems = [
 export default function DashboardLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
