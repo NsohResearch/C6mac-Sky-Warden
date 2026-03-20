@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/auth.store';
 import {
   LayoutDashboard, Map, Shield, Plane, Radio, BarChart3,
   Settings, LogOut, Menu, X, ChevronDown, Bell,
-  Building2, Code2, Users, FileCheck, AlertTriangle,
+  Building2, Code2, Users, FileCheck, AlertTriangle, ShieldAlert,
   ClipboardCheck, CreditCard, Landmark, Palette, Navigation,
 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -26,6 +26,7 @@ const navItems: NavItem[] = [
   { label: 'Fleet', path: '/dashboard/fleet', icon: <Radio size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
   { label: 'Registration', path: '/dashboard/registration', icon: <ClipboardCheck size={20} />, personas: ['individual_pilot', 'enterprise_manager'] },
   { label: 'Compliance', path: '/dashboard/compliance', icon: <FileCheck size={20} />, personas: ['enterprise_manager', 'agency_representative'] },
+  { label: 'Safety', path: '/dashboard/safety', icon: <ShieldAlert size={20} /> },
   { label: 'Analytics', path: '/dashboard/analytics', icon: <BarChart3 size={20} /> },
   { label: 'Agency Rules', path: '/dashboard/agency', icon: <Building2 size={20} />, personas: ['agency_representative'] },
   { label: 'Government Revenue', path: '/dashboard/government-revenue', icon: <Landmark size={20} />, personas: ['agency_representative'] },

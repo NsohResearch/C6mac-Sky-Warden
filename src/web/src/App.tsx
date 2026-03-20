@@ -28,6 +28,9 @@ import { OnboardingPage } from './pages/OnboardingPage';
 import { FlightPlanPage } from './pages/FlightPlanPage';
 import { OnboardingGuard } from './components/OnboardingGuard';
 
+// Safety
+import { SafetyReportingPage } from './pages/SafetyReportingPage';
+
 // Public marketing pages
 import { LandingPage } from './pages/LandingPage';
 import { IndustriesPage } from './pages/IndustriesPage';
@@ -99,6 +102,7 @@ export default function App() {
         <Route path="missions" element={<MissionsPage />} />
         <Route path="fleet" element={<FleetPage />} />
         <Route path="compliance" element={<CompliancePage />} />
+        <Route path="safety" element={<SafetyReportingPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="flight-plans" element={<FlightPlanPage />} />

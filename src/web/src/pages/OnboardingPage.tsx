@@ -1,23 +1,127 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, FileText, Plane, ClipboardList, CheckCircle, ArrowRight,
   ArrowLeft, Upload, AlertTriangle, Shield, MapPin, Clock,
   ChevronDown, Globe, Phone, Mail, Building2, ExternalLink,
+  Crosshair, Loader2, Info,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 
-type Country = 'US' | 'CA' | 'NG' | 'KE' | 'OTHER';
+// ============================================================
+// 55-COUNTRY REGULATORY AUTHORITY DATABASE
+// Auto-populated based on geolocation, user can override
+// ============================================================
+interface CountryEntry {
+  code: string;
+  name: string;
+  flag: string;
+  region: string;
+  authority: string;
+  authorityAcronym: string;
+  website: string;
+  registrationPortal: string;
+  pilotCertName: string;
+  primaryRegulation: string;
+  registrationRequired: boolean;
+  remoteIdRequired: boolean;
+  maxAltitudeFt: number;
+  currency: string;
+  dateFormat: string;
+  altitudeUnit: string;
+  speedUnit: string;
+  emergencyNumber: string;
+}
 
-const countries: { code: Country; label: string; flag: string; authority: string }[] = [
-  { code: 'US', label: 'United States', flag: '\u{1F1FA}\u{1F1F8}', authority: 'FAA' },
-  { code: 'CA', label: 'Canada', flag: '\u{1F1E8}\u{1F1E6}', authority: 'Transport Canada' },
-  { code: 'NG', label: 'Nigeria', flag: '\u{1F1F3}\u{1F1EC}', authority: 'NCAA' },
-  { code: 'KE', label: 'Kenya', flag: '\u{1F1F0}\u{1F1EA}', authority: 'KCAA' },
-  { code: 'OTHER', label: 'Other', flag: '\u{1F310}', authority: 'Local Authority' },
+const REGULATORY_COUNTRIES: CountryEntry[] = [
+  // North America
+  { code: 'US', name: 'United States', flag: '🇺🇸', region: 'North America', authority: 'Federal Aviation Administration', authorityAcronym: 'FAA', website: 'https://www.faa.gov/uas', registrationPortal: 'https://faadronezone.faa.gov', pilotCertName: 'Remote Pilot Certificate (Part 107)', primaryRegulation: '14 CFR Part 107', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 400, currency: 'USD', dateFormat: 'MM/DD/YYYY', altitudeUnit: 'feet', speedUnit: 'mph', emergencyNumber: '911' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦', region: 'North America', authority: 'Transport Canada Civil Aviation', authorityAcronym: 'TCCA', website: 'https://tc.canada.ca/en/aviation/drone-safety', registrationPortal: 'https://tc.canada.ca/en/aviation/drone-safety/register-your-drone', pilotCertName: 'RPAS Pilot Certificate (Advanced)', primaryRegulation: 'CARs Part IX', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 400, currency: 'CAD', dateFormat: 'YYYY-MM-DD', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '911' },
+  { code: 'MX', name: 'Mexico', flag: '🇲🇽', region: 'North America', authority: 'Agencia Federal de Aviación Civil', authorityAcronym: 'AFAC', website: 'https://www.gob.mx/afac', registrationPortal: 'https://www.gob.mx/afac', pilotCertName: 'RPAS Operator License', primaryRegulation: 'CO AV-23/10 R4', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'MXN', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '911' },
+  // Europe
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', region: 'Europe', authority: 'Civil Aviation Authority', authorityAcronym: 'CAA', website: 'https://www.caa.co.uk/drones', registrationPortal: 'https://register-drones.caa.co.uk', pilotCertName: 'Flyer ID + Operator ID', primaryRegulation: 'UK UAS Regulation', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 400, currency: 'GBP', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'mph', emergencyNumber: '999' },
+  { code: 'FR', name: 'France', flag: '🇫🇷', region: 'Europe', authority: 'Direction Générale de l\'Aviation Civile', authorityAcronym: 'DGAC', website: 'https://www.ecologie.gouv.fr/drones', registrationPortal: 'https://alphatango.aviation-civile.gouv.fr', pilotCertName: 'Open Category Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪', region: 'Europe', authority: 'Luftfahrt-Bundesamt', authorityAcronym: 'LBA', website: 'https://www.lba.de/EN/Drones', registrationPortal: 'https://uas-registration.lba-openuav.de', pilotCertName: 'EU Remote Pilot Certificate (A2)', primaryRegulation: 'EU 2019/947 + LuftVO', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD.MM.YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸', region: 'Europe', authority: 'Agencia Estatal de Seguridad Aérea', authorityAcronym: 'AESA', website: 'https://www.seguridadaerea.gob.es/en/drones', registrationPortal: 'https://www.seguridadaerea.gob.es', pilotCertName: 'AESA Pilot Certificate', primaryRegulation: 'EU 2019/947 + RD 517/2024', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹', region: 'Europe', authority: 'Ente Nazionale per l\'Aviazione Civile', authorityAcronym: 'ENAC', website: 'https://www.enac.gov.it/en/drones', registrationPortal: 'https://www.d-flight.it', pilotCertName: 'ENAC UAS Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'NL', name: 'Netherlands', flag: '🇳🇱', region: 'Europe', authority: 'Inspectie Leefomgeving en Transport', authorityAcronym: 'ILT', website: 'https://www.ilent.nl/onderwerpen/drones', registrationPortal: 'https://www.registreer-uw-drone.nl', pilotCertName: 'EU Remote Pilot Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD-MM-YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'SE', name: 'Sweden', flag: '🇸🇪', region: 'Europe', authority: 'Transportstyrelsen', authorityAcronym: 'TS', website: 'https://www.transportstyrelsen.se/en/aviation/drones', registrationPortal: 'https://www.transportstyrelsen.se', pilotCertName: 'Swedish Drone Pilot Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'SEK', dateFormat: 'YYYY-MM-DD', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'NO', name: 'Norway', flag: '🇳🇴', region: 'Europe', authority: 'Luftfartstilsynet', authorityAcronym: 'CAA Norway', website: 'https://luftfartstilsynet.no/en/drones', registrationPortal: 'https://luftfartstilsynet.no/en/drones', pilotCertName: 'Norwegian Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'NOK', dateFormat: 'DD.MM.YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'CH', name: 'Switzerland', flag: '🇨🇭', region: 'Europe', authority: 'Federal Office of Civil Aviation', authorityAcronym: 'FOCA', website: 'https://www.bazl.admin.ch/bazl/en/home/drones', registrationPortal: 'https://www.bazl.admin.ch', pilotCertName: 'FOCA Drone Certificate', primaryRegulation: 'EU 2019/947 (adopted)', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'CHF', dateFormat: 'DD.MM.YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'IE', name: 'Ireland', flag: '🇮🇪', region: 'Europe', authority: 'Irish Aviation Authority', authorityAcronym: 'IAA', website: 'https://www.iaa.ie/general-aviation/drones', registrationPortal: 'https://www.iaa.ie/general-aviation/drones', pilotCertName: 'IAA Drone Pilot Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'PL', name: 'Poland', flag: '🇵🇱', region: 'Europe', authority: 'Urząd Lotnictwa Cywilnego', authorityAcronym: 'ULC', website: 'https://www.ulc.gov.pl/en/drones', registrationPortal: 'https://drony.ulc.gov.pl', pilotCertName: 'ULC Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'PLN', dateFormat: 'DD.MM.YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'AT', name: 'Austria', flag: '🇦🇹', region: 'Europe', authority: 'Austro Control', authorityAcronym: 'ACG', website: 'https://www.austrocontrol.at/en/drones', registrationPortal: 'https://www.dronespace.at', pilotCertName: 'Austro Control Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD.MM.YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'PT', name: 'Portugal', flag: '🇵🇹', region: 'Europe', authority: 'Autoridade Nacional da Aviação Civil', authorityAcronym: 'ANAC', website: 'https://www.anac.pt/vPT/Generico/Drones', registrationPortal: 'https://www.anac.pt', pilotCertName: 'ANAC Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'BE', name: 'Belgium', flag: '🇧🇪', region: 'Europe', authority: 'Direction Générale Transport Aérien', authorityAcronym: 'DGTA', website: 'https://mobilit.belgium.be/en/air/drones', registrationPortal: 'https://mobilit.belgium.be', pilotCertName: 'Belgian Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'DK', name: 'Denmark', flag: '🇩🇰', region: 'Europe', authority: 'Danish Transport Authority', authorityAcronym: 'DTA', website: 'https://www.trafikstyrelsen.dk/en/drones', registrationPortal: 'https://www.trafikstyrelsen.dk', pilotCertName: 'Danish Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'DKK', dateFormat: 'DD-MM-YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'FI', name: 'Finland', flag: '🇫🇮', region: 'Europe', authority: 'Finnish Transport & Communications Agency', authorityAcronym: 'Traficom', website: 'https://www.traficom.fi/en/transport/aviation/drones', registrationPortal: 'https://www.droneinfo.fi', pilotCertName: 'Traficom Drone Certificate', primaryRegulation: 'EU 2019/947', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'EUR', dateFormat: 'DD.MM.YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  // Africa
+  { code: 'NG', name: 'Nigeria', flag: '🇳🇬', region: 'Africa', authority: 'Nigerian Civil Aviation Authority', authorityAcronym: 'NCAA', website: 'https://ncaa.gov.ng', registrationPortal: 'https://ncaa.gov.ng/rpas', pilotCertName: 'RPAS Operator Certificate (ROC)', primaryRegulation: 'Nig.CARs Part 21', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'NGN', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'KE', name: 'Kenya', flag: '🇰🇪', region: 'Africa', authority: 'Kenya Civil Aviation Authority', authorityAcronym: 'KCAA', website: 'https://www.kcaa.or.ke', registrationPortal: 'https://www.kcaa.or.ke/rpas', pilotCertName: 'Remote Pilot License (RPL)', primaryRegulation: 'Civil Aviation (RPAS) Regulations 2020', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'KES', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '999' },
+  { code: 'ZA', name: 'South Africa', flag: '🇿🇦', region: 'Africa', authority: 'South African Civil Aviation Authority', authorityAcronym: 'SACAA', website: 'https://www.caa.co.za', registrationPortal: 'https://www.caa.co.za/rpas', pilotCertName: 'Remote Pilot License (RPL)', primaryRegulation: 'SACAA RPAS Regulations Part 101', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'ZAR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '10111' },
+  { code: 'GH', name: 'Ghana', flag: '🇬🇭', region: 'Africa', authority: 'Ghana Civil Aviation Authority', authorityAcronym: 'GCAA', website: 'https://www.gcaa.com.gh', registrationPortal: 'https://www.gcaa.com.gh', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'GCAA RPAS Directives', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'GHS', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'RW', name: 'Rwanda', flag: '🇷🇼', region: 'Africa', authority: 'Rwanda Civil Aviation Authority', authorityAcronym: 'RCAA', website: 'https://www.caa.gov.rw', registrationPortal: 'https://www.caa.gov.rw', pilotCertName: 'RPAS Operator License', primaryRegulation: 'RCAA Drone Regulations 2021', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'RWF', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'TZ', name: 'Tanzania', flag: '🇹🇿', region: 'Africa', authority: 'Tanzania Civil Aviation Authority', authorityAcronym: 'TCAA', website: 'https://www.tcaa.go.tz', registrationPortal: 'https://www.tcaa.go.tz', pilotCertName: 'RPAS Permit', primaryRegulation: 'TCAA RPAS Regulations 2020', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'TZS', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'UG', name: 'Uganda', flag: '🇺🇬', region: 'Africa', authority: 'Uganda Civil Aviation Authority', authorityAcronym: 'UCAA', website: 'https://www.caa.go.ug', registrationPortal: 'https://www.caa.go.ug', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'UCAA RPAS Regulations 2021', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'UGX', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '999' },
+  { code: 'ET', name: 'Ethiopia', flag: '🇪🇹', region: 'Africa', authority: 'Ethiopian Civil Aviation Authority', authorityAcronym: 'ECAA', website: 'https://www.ecaa.gov.et', registrationPortal: 'https://www.ecaa.gov.et', pilotCertName: 'RPAS Operator License', primaryRegulation: 'ECAA RPAS Directive', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'ETB', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '911' },
+  { code: 'SN', name: 'Senegal', flag: '🇸🇳', region: 'Africa', authority: 'Agence Nationale de l\'Aviation Civile', authorityAcronym: 'ANACIM', website: 'https://www.anacim.sn', registrationPortal: 'https://www.anacim.sn', pilotCertName: 'RPAS Operator Authorization', primaryRegulation: 'ANACIM Drone Regulations', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'XOF', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '17' },
+  { code: 'CI', name: "Côte d'Ivoire", flag: '🇨🇮', region: 'Africa', authority: "Autorité Nationale de l'Aviation Civile", authorityAcronym: 'ANAC-CI', website: 'https://www.anac.ci', registrationPortal: 'https://www.anac.ci', pilotCertName: 'RPAS Authorization', primaryRegulation: 'ANAC Drone Regulations', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'XOF', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '110' },
+  { code: 'EG', name: 'Egypt', flag: '🇪🇬', region: 'Africa', authority: 'Egyptian Civil Aviation Authority', authorityAcronym: 'ECAA', website: 'https://www.civilaviation.gov.eg', registrationPortal: 'https://www.civilaviation.gov.eg', pilotCertName: 'RPAS Operator Permit', primaryRegulation: 'ECAA Drone Law No. 28/2020', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'EGP', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '122' },
+  { code: 'MA', name: 'Morocco', flag: '🇲🇦', region: 'Africa', authority: 'Direction Générale de l\'Aviation Civile', authorityAcronym: 'DGAC-MA', website: 'https://www.dgac.gov.ma', registrationPortal: 'https://www.dgac.gov.ma', pilotCertName: 'Professional RPAS Authorization', primaryRegulation: 'Decree No. 2-15-527', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'MAD', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '15' },
+  { code: 'CM', name: 'Cameroon', flag: '🇨🇲', region: 'Africa', authority: 'Cameroon Civil Aviation Authority', authorityAcronym: 'CCAA', website: 'https://www.ccaa.aero', registrationPortal: 'https://www.ccaa.aero', pilotCertName: 'RPAS Operator Permit', primaryRegulation: 'CCAA RPAS Regulations', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'XAF', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '117' },
+  { code: 'MZ', name: 'Mozambique', flag: '🇲🇿', region: 'Africa', authority: 'Instituto de Aviação Civil de Moçambique', authorityAcronym: 'IACM', website: 'https://www.iacm.gov.mz', registrationPortal: 'https://www.iacm.gov.mz', pilotCertName: 'RPAS Operator Permit', primaryRegulation: 'IACM RPAS Regulation', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 100, currency: 'MZN', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '119' },
+  // Middle East
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', region: 'Middle East', authority: 'General Civil Aviation Authority', authorityAcronym: 'GCAA', website: 'https://www.gcaa.gov.ae', registrationPortal: 'https://www.gcaa.gov.ae/en/drones', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'CAR Part VIII Chapter 4', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 400, currency: 'AED', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '999' },
+  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦', region: 'Middle East', authority: 'General Authority of Civil Aviation', authorityAcronym: 'GACA', website: 'https://www.gaca.gov.sa', registrationPortal: 'https://www.gaca.gov.sa', pilotCertName: 'UAS Operator Certificate', primaryRegulation: 'GACA UAS Regulations', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'SAR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '911' },
+  { code: 'IL', name: 'Israel', flag: '🇮🇱', region: 'Middle East', authority: 'Civil Aviation Authority of Israel', authorityAcronym: 'CAAI', website: 'https://www.gov.il/en/departments/civil_aviation_authority', registrationPortal: 'https://www.gov.il/en/departments/civil_aviation_authority', pilotCertName: 'Drone Operator License', primaryRegulation: 'Aviation Regulations (RPAS)', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'ILS', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '100' },
+  { code: 'QA', name: 'Qatar', flag: '🇶🇦', region: 'Middle East', authority: 'Qatar Civil Aviation Authority', authorityAcronym: 'QCAA', website: 'https://www.caa.gov.qa', registrationPortal: 'https://www.caa.gov.qa', pilotCertName: 'UAS Operator Permit', primaryRegulation: 'QCAA UAS Regulations', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'QAR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '999' },
+  { code: 'OM', name: 'Oman', flag: '🇴🇲', region: 'Middle East', authority: 'Public Authority for Civil Aviation', authorityAcronym: 'PACA', website: 'https://www.paca.gov.om', registrationPortal: 'https://www.paca.gov.om', pilotCertName: 'UAS Operator Permit', primaryRegulation: 'PACA UAS Regulations', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'OMR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '9999' },
+  // Asia-Pacific
+  { code: 'AU', name: 'Australia', flag: '🇦🇺', region: 'Asia-Pacific', authority: 'Civil Aviation Safety Authority', authorityAcronym: 'CASA', website: 'https://www.casa.gov.au/drones', registrationPortal: 'https://my.casa.gov.au', pilotCertName: 'RePL (Remote Pilot Licence)', primaryRegulation: 'CASR Part 101', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'AUD', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '000' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿', region: 'Asia-Pacific', authority: 'Civil Aviation Authority of New Zealand', authorityAcronym: 'CAA NZ', website: 'https://www.aviation.govt.nz/drones', registrationPortal: 'https://www.aviation.govt.nz', pilotCertName: 'Part 102 Certificate', primaryRegulation: 'CAR Part 101/102', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'NZD', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '111' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵', region: 'Asia-Pacific', authority: 'Japan Civil Aviation Bureau', authorityAcronym: 'JCAB', website: 'https://www.mlit.go.jp/koku/koku_tk10_000003.html', registrationPortal: 'https://www.dips-reg.mlit.go.jp', pilotCertName: 'UAS Pilot License (Level 1-4)', primaryRegulation: 'Aviation Act Articles 132+', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 492, currency: 'JPY', dateFormat: 'YYYY/MM/DD', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '110' },
+  { code: 'KR', name: 'South Korea', flag: '🇰🇷', region: 'Asia-Pacific', authority: 'Ministry of Land, Infrastructure & Transport', authorityAcronym: 'MOLIT', website: 'https://www.molit.go.kr', registrationPortal: 'https://drone.onestop.go.kr', pilotCertName: 'UAS Pilot Certificate', primaryRegulation: 'Aviation Safety Act', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 492, currency: 'KRW', dateFormat: 'YYYY-MM-DD', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '119' },
+  { code: 'IN', name: 'India', flag: '🇮🇳', region: 'Asia-Pacific', authority: 'Directorate General of Civil Aviation', authorityAcronym: 'DGCA', website: 'https://digitalsky.dgca.gov.in', registrationPortal: 'https://digitalsky.dgca.gov.in', pilotCertName: 'Remote Pilot Certificate', primaryRegulation: 'Drone Rules 2021', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 400, currency: 'INR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬', region: 'Asia-Pacific', authority: 'Civil Aviation Authority of Singapore', authorityAcronym: 'CAAS', website: 'https://www.caas.gov.sg/public-passengers/unmanned-aircraft', registrationPortal: 'https://www.caas.gov.sg/ua', pilotCertName: 'UA Operator Permit', primaryRegulation: 'Unmanned Aircraft Act 2015', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 200, currency: 'SGD', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '995' },
+  { code: 'MY', name: 'Malaysia', flag: '🇲🇾', region: 'Asia-Pacific', authority: 'Civil Aviation Authority of Malaysia', authorityAcronym: 'CAAM', website: 'https://www.caam.gov.my', registrationPortal: 'https://www.caam.gov.my', pilotCertName: 'RPA Pilot License', primaryRegulation: 'MCAR Part 15', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'MYR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '999' },
+  { code: 'TH', name: 'Thailand', flag: '🇹🇭', region: 'Asia-Pacific', authority: 'Civil Aviation Authority of Thailand', authorityAcronym: 'CAAT', website: 'https://www.caat.or.th', registrationPortal: 'https://www.caat.or.th', pilotCertName: 'UA Operator Certificate', primaryRegulation: 'CAAT Drone Notification 2020', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 295, currency: 'THB', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '1669' },
+  { code: 'PH', name: 'Philippines', flag: '🇵🇭', region: 'Asia-Pacific', authority: 'Civil Aviation Authority of the Philippines', authorityAcronym: 'CAAP', website: 'https://www.caap.gov.ph', registrationPortal: 'https://www.caap.gov.ph', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'CAAP MC 01-2015', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'PHP', dateFormat: 'MM/DD/YYYY', altitudeUnit: 'feet', speedUnit: 'kph', emergencyNumber: '911' },
+  { code: 'ID', name: 'Indonesia', flag: '🇮🇩', region: 'Asia-Pacific', authority: 'Directorate General of Civil Aviation', authorityAcronym: 'DGCA-ID', website: 'https://hubud.dephub.go.id', registrationPortal: 'https://hubud.dephub.go.id', pilotCertName: 'UAS Operator License', primaryRegulation: 'PM 37/2020', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 492, currency: 'IDR', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '112' },
+  { code: 'CN', name: 'China', flag: '🇨🇳', region: 'Asia-Pacific', authority: 'Civil Aviation Administration of China', authorityAcronym: 'CAAC', website: 'http://www.caac.gov.cn', registrationPortal: 'https://uas.caac.gov.cn', pilotCertName: 'UAS Operator Certificate (AOPA/CAAC)', primaryRegulation: 'CAAC UAS Regulations 2024', registrationRequired: true, remoteIdRequired: true, maxAltitudeFt: 394, currency: 'CNY', dateFormat: 'YYYY-MM-DD', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '110' },
+  // South America
+  { code: 'BR', name: 'Brazil', flag: '🇧🇷', region: 'South America', authority: 'Agência Nacional de Aviação Civil', authorityAcronym: 'ANAC-BR', website: 'https://www.gov.br/anac/pt-br/assuntos/drones', registrationPortal: 'https://sistemas.anac.gov.br/sisant', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'RBAC-E 94', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'BRL', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '190' },
+  { code: 'CO', name: 'Colombia', flag: '🇨🇴', region: 'South America', authority: 'Aeronáutica Civil de Colombia', authorityAcronym: 'Aerocivil', website: 'https://www.aerocivil.gov.co', registrationPortal: 'https://www.aerocivil.gov.co', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'RAC 91 Apéndice 13', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'COP', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '123' },
+  { code: 'AR', name: 'Argentina', flag: '🇦🇷', region: 'South America', authority: 'Administración Nacional de Aviación Civil', authorityAcronym: 'ANAC-AR', website: 'https://www.argentina.gob.ar/anac', registrationPortal: 'https://www.argentina.gob.ar/anac/drones', pilotCertName: 'VANT Operator Certificate', primaryRegulation: 'ANAC Resolución 885/2019', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'ARS', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '107' },
+  { code: 'CL', name: 'Chile', flag: '🇨🇱', region: 'South America', authority: 'Dirección General de Aeronáutica Civil', authorityAcronym: 'DGAC-CL', website: 'https://www.dgac.gob.cl', registrationPortal: 'https://www.dgac.gob.cl/rpas', pilotCertName: 'RPAS Operator Certificate', primaryRegulation: 'DAN 151', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'CLP', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '131' },
+  { code: 'PE', name: 'Peru', flag: '🇵🇪', region: 'South America', authority: 'Dirección General de Aeronáutica Civil', authorityAcronym: 'DGAC-PE', website: 'https://www.gob.pe/mtc', registrationPortal: 'https://www.gob.pe/mtc', pilotCertName: 'RPAS Operator Permit', primaryRegulation: 'NTC 001-2019', registrationRequired: true, remoteIdRequired: false, maxAltitudeFt: 400, currency: 'PEN', dateFormat: 'DD/MM/YYYY', altitudeUnit: 'meters', speedUnit: 'kph', emergencyNumber: '105' },
 ];
+
+// Group countries by region for dropdown optgroups
+const regions = [...new Set(REGULATORY_COUNTRIES.map(c => c.region))];
+
+// Registration fees mapped to country (representative fees)
+const registrationFees: Record<string, { amount: string; currency: string; govShare: string; platformShare: string }> = {
+  US: { amount: '$5.00', currency: 'USD', govShare: '$3.50', platformShare: '$1.50' },
+  CA: { amount: 'CA$10.00', currency: 'CAD', govShare: 'CA$7.00', platformShare: 'CA$3.00' },
+  GB: { amount: '£9.00', currency: 'GBP', govShare: '£6.30', platformShare: '£2.70' },
+  FR: { amount: '€30.00', currency: 'EUR', govShare: '€21.00', platformShare: '€9.00' },
+  DE: { amount: '€30.00', currency: 'EUR', govShare: '€21.00', platformShare: '€9.00' },
+  NG: { amount: '₦75,000', currency: 'NGN', govShare: '₦52,500', platformShare: '₦22,500' },
+  KE: { amount: 'KSh 65,000', currency: 'KES', govShare: 'KSh 45,500', platformShare: 'KSh 19,500' },
+  ZA: { amount: 'R900.00', currency: 'ZAR', govShare: 'R630.00', platformShare: 'R270.00' },
+  GH: { amount: 'GH₵350.00', currency: 'GHS', govShare: 'GH₵245.00', platformShare: 'GH₵105.00' },
+  RW: { amount: 'RWF 5,000', currency: 'RWF', govShare: 'RWF 3,500', platformShare: 'RWF 1,500' },
+  AE: { amount: 'AED 100', currency: 'AED', govShare: 'AED 70', platformShare: 'AED 30' },
+  AU: { amount: 'A$20.00', currency: 'AUD', govShare: 'A$14.00', platformShare: 'A$6.00' },
+  JP: { amount: '¥1,500', currency: 'JPY', govShare: '¥1,050', platformShare: '¥450' },
+  IN: { amount: '₹100', currency: 'INR', govShare: '₹70', platformShare: '₹30' },
+  BR: { amount: 'R$55.00', currency: 'BRL', govShare: 'R$38.50', platformShare: 'R$16.50' },
+  CN: { amount: '¥50.00', currency: 'CNY', govShare: '¥35.00', platformShare: '¥15.00' },
+};
+
+const defaultFee = { amount: '$10.00', currency: 'USD', govShare: '$7.00', platformShare: '$3.00' };
 
 const manufacturers = ['DJI', 'Autel', 'Skydio', 'Parrot', 'Custom'];
 
@@ -62,9 +166,38 @@ export function OnboardingPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState<OnboardingStep>(1);
 
-  // Step 1 state
-  const [selectedCountry, setSelectedCountry] = useState<Country>('US');
+  // Step 1 state — country with geolocation
+  const [selectedCountry, setSelectedCountry] = useState<string>('US');
+  const [geoDetecting, setGeoDetecting] = useState(false);
+  const [geoDetected, setGeoDetected] = useState(false);
+  const [geoCountryName, setGeoCountryName] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState('individual_pilot');
+
+  // Geolocation on mount — detect user's country and auto-populate
+  useEffect(() => {
+    const detectCountry = async () => {
+      setGeoDetecting(true);
+      try {
+        // Use IP-based geolocation (no permission required)
+        const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
+        if (res.ok) {
+          const data = await res.json();
+          const countryCode = data.country_code;
+          const match = REGULATORY_COUNTRIES.find(c => c.code === countryCode);
+          if (match) {
+            setSelectedCountry(match.code);
+            setGeoCountryName(match.name);
+            setGeoDetected(true);
+          }
+        }
+      } catch {
+        // Silently fail — user can select manually
+      } finally {
+        setGeoDetecting(false);
+      }
+    };
+    detectCountry();
+  }, []);
 
   // Step 2 state
   const [certVerified, setCertVerified] = useState(false);
@@ -82,8 +215,8 @@ export function OnboardingPage() {
   const [flightPlanSkipped, setFlightPlanSkipped] = useState(false);
   const [commLostAction, setCommLostAction] = useState('return_home');
 
-  const countryObj = countries.find((c) => c.code === selectedCountry) ?? countries[0];
-  const fee = registrationFees[selectedCountry];
+  const countryObj = REGULATORY_COUNTRIES.find((c) => c.code === selectedCountry) ?? REGULATORY_COUNTRIES[0];
+  const fee = registrationFees[selectedCountry] ?? defaultFee;
 
   const handleVerifyCert = () => {
     setCertVerified(true);
@@ -99,7 +232,7 @@ export function OnboardingPage() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let id = '';
     for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)];
-    const prefix = selectedCountry === 'OTHER' ? 'XX' : selectedCountry;
+    const prefix = selectedCountry;
     setGeneratedDDID(`SKW-${prefix}-${id}`);
     setDroneRegistered(true);
   };
@@ -146,7 +279,7 @@ export function OnboardingPage() {
                 <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Profile verified</p>
-                  <p className="text-xs text-gray-500">{countryObj.flag} {countryObj.label} &middot; {countryObj.authority}</p>
+                  <p className="text-xs text-gray-500">{countryObj.flag} {countryObj.name} &middot; {countryObj.authorityAcronym}</p>
                 </div>
               </div>
 
@@ -305,15 +438,80 @@ export function OnboardingPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                  {geoDetecting && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600 mb-1">
+                      <Loader2 size={12} className="animate-spin" />
+                      Detecting your location...
+                    </div>
+                  )}
+                  {geoDetected && !geoDetecting && (
+                    <div className="flex items-center gap-2 text-xs text-green-600 mb-1">
+                      <Crosshair size={12} />
+                      Auto-detected: {geoCountryName} — you can change this if registering for a different region
+                    </div>
+                  )}
                   <select
                     value={selectedCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value as Country)}
+                    onChange={(e) => {
+                      setSelectedCountry(e.target.value);
+                      if (geoDetected && e.target.value !== selectedCountry) {
+                        setGeoDetected(false); // User overrode geo
+                      }
+                    }}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    {countries.map((c) => (
-                      <option key={c.code} value={c.code}>{c.flag} {c.label} ({c.authority})</option>
+                    {regions.map((region) => (
+                      <optgroup key={region} label={region}>
+                        {REGULATORY_COUNTRIES.filter(c => c.region === region).map((c) => (
+                          <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.authorityAcronym})</option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
+                  <p className="text-xs text-gray-400 mt-1">
+                    <Info size={10} className="inline mr-1" />
+                    Select where you'll operate. Traveling? Choose your destination country to pre-register.
+                  </p>
+                </div>
+
+                {/* Auto-populated Authority Card */}
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield size={16} className="text-blue-600" />
+                    <span className="text-sm font-semibold text-blue-900">Regulatory Authority</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-gray-500">Authority:</span>
+                      <p className="font-medium text-gray-900">{countryObj.authority}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Acronym:</span>
+                      <p className="font-medium text-gray-900">{countryObj.authorityAcronym}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Regulation:</span>
+                      <p className="font-medium text-gray-900">{countryObj.primaryRegulation}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Pilot Cert:</span>
+                      <p className="font-medium text-gray-900">{countryObj.pilotCertName}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Max Altitude:</span>
+                      <p className="font-medium text-gray-900">{countryObj.maxAltitudeFt} ft AGL</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Remote ID:</span>
+                      <p className={clsx('font-medium', countryObj.remoteIdRequired ? 'text-red-600' : 'text-green-600')}>
+                        {countryObj.remoteIdRequired ? 'Required' : 'Not Required'}
+                      </p>
+                    </div>
+                  </div>
+                  <a href={countryObj.website} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 mt-2">
+                    <ExternalLink size={10} /> Visit {countryObj.authorityAcronym} website
+                  </a>
                 </div>
 
                 <div>
@@ -362,7 +560,7 @@ export function OnboardingPage() {
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 mb-1">Pilot Certification</h2>
                   <p className="text-sm text-gray-500">
-                    Verify your pilot credentials for {countryObj.flag} {countryObj.label} ({countryObj.authority}).
+                    Verify your pilot credentials for {countryObj.flag} {countryObj.name} ({countryObj.authority}).
                   </p>
                 </div>
 
@@ -462,26 +660,38 @@ export function OnboardingPage() {
                   </div>
                 )}
 
-                {selectedCountry === 'OTHER' && (
+                {!['US', 'CA', 'NG', 'KE'].includes(selectedCountry) && (
                   <div className="space-y-4">
                     <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                      <p className="text-xs text-blue-700 font-medium">International Requirements</p>
-                      <p className="text-xs text-blue-600 mt-0.5">Provide your pilot license details and issuing authority</p>
+                      <p className="text-xs text-blue-700 font-medium">{countryObj.flag} {countryObj.name} — {countryObj.authorityAcronym} Requirements</p>
+                      <p className="text-xs text-blue-600 mt-0.5">
+                        Provide your {countryObj.pilotCertName} details as required by {countryObj.authority}
+                      </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Pilot License Number</label>
-                        <input type="text" placeholder="License number" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{countryObj.pilotCertName} Number</label>
+                        <input type="text" placeholder="Certificate/license number" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Issuing Authority</label>
-                        <input type="text" placeholder="e.g. EASA, CASA, DGCA" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <input type="text" defaultValue={countryObj.authorityAcronym} className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm" readOnly />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
                         <input type="date" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Regulation Reference</label>
+                        <input type="text" defaultValue={countryObj.primaryRegulation} className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm" readOnly />
+                      </div>
                     </div>
+                    {countryObj.remoteIdRequired && (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                        <p className="text-xs text-amber-700 font-medium">⚠️ Remote ID Required in {countryObj.name}</p>
+                        <p className="text-xs text-amber-600 mt-0.5">Your drone must have an active Remote ID module to operate in this jurisdiction.</p>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -626,7 +836,7 @@ export function OnboardingPage() {
                           <span className="font-medium text-gray-900">{fee.amount}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-gray-400 pl-4">Government Portion (70%) &mdash; {fee.authority}</span>
+                          <span className="text-gray-400 pl-4">Government Portion (70%) &mdash; {countryObj.authorityAcronym}</span>
                           <span className="text-gray-500">{fee.govShare}</span>
                         </div>
                         <div className="flex justify-between text-xs">
@@ -638,7 +848,7 @@ export function OnboardingPage() {
 
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
                       <p className="text-xs text-amber-700">
-                        70% of your registration fee ({fee.govShare}) is remitted to {fee.authority} to support airspace safety and regulatory oversight.
+                        70% of your registration fee ({fee.govShare}) is remitted to {countryObj.authorityAcronym} to support airspace safety and regulatory oversight.
                       </p>
                     </div>
 

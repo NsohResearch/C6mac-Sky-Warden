@@ -14,3 +14,4 @@ export * from './common';
 export * from './whitelabel';
 export * from './flightplan';
 export * from './safety';
+export * from './regulatory';
