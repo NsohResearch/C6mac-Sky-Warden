@@ -212,7 +212,7 @@ export default function Login() {
         <div className="bg-card border border-border rounded-2xl shadow-xl shadow-primary/5 p-6 sm:p-8">
           {/* Logo */}
           <div className="flex justify-center mb-5">
-            <img src={logoMark} alt="C6mac Sky Warden" className="w-16 h-16 rounded-2xl shadow-md" />
+            <img src={logoMark} alt="SkyWarden" className="w-16 h-16 rounded-2xl shadow-md" />
           </div>
 
           {/* Heading */}
@@ -387,7 +387,7 @@ export default function Login() {
 
         {/* Footer text */}
         <p className="text-xs text-muted-foreground text-center mt-5">
-          © {new Date().getFullYear()} C6mac Sky Warden. All rights reserved.
+          © {new Date().getFullYear()} SkyWarden. All rights reserved.
         </p>
       </div>
 

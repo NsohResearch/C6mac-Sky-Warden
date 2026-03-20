@@ -1,7 +1,7 @@
 const translations = {
   en: {
     welcome: "Welcome",
-    joinCommunity: "Join the CEMAC community",
+    joinCommunity: "Join the SkyWarden community",
     signIn: "Sign In",
     signUp: "Sign Up",
     continueGoogle: "Continue with Google",
@@ -49,7 +49,7 @@ const translations = {
   },
   fr: {
     welcome: "Bienvenue",
-    joinCommunity: "Rejoignez la communauté CEMAC",
+    joinCommunity: "Rejoignez la communauté SkyWarden",
     signIn: "Connexion",
     signUp: "Inscription",
     continueGoogle: "Continuer avec Google",
@@ -97,7 +97,7 @@ const translations = {
   },
   es: {
     welcome: "Bienvenido",
-    joinCommunity: "Únete a la comunidad CEMAC",
+    joinCommunity: "Únete a la comunidad SkyWarden",
     signIn: "Iniciar sesión",
     signUp: "Registrarse",
     continueGoogle: "Continuar con Google",
@@ -145,7 +145,7 @@ const translations = {
   },
   pt: {
     welcome: "Bem-vindo",
-    joinCommunity: "Junte-se à comunidade CEMAC",
+    joinCommunity: "Junte-se à comunidade SkyWarden",
     signIn: "Entrar",
     signUp: "Cadastrar",
     continueGoogle: "Continuar com Google",

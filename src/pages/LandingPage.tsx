@@ -242,7 +242,7 @@ export default function LandingPage() {
           <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
             <Globe2 className="h-7 w-7 text-accent" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">Join the C6mac Community</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Join the SkyWarden Community</h2>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground text-pretty">
             Connect with drone operators, agencies, and developers across {Object.keys(REGION_CONFIGS).length} countries. Share flight data, collaborate on airspace safety, and help shape the future of UAV operations in your region.
           </p>
@@ -289,7 +289,7 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Plane className="h-5 w-5 text-accent" />
-                <span className="text-sm font-semibold">C6mac Sky Warden</span>
+                <span className="text-sm font-semibold">SkyWarden</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">UAV airspace management platform for the drone economy. Trusted across North America and Africa.</p>
             </div>
@@ -319,7 +319,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/40 pt-6">
-            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} C6mac Research. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} SkyWarden. All rights reserved.</p>
             <p className="text-xs text-muted-foreground">Built for pilots, by pilots.</p>
           </div>
         </div>

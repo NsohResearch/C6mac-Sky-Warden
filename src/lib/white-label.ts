@@ -1,4 +1,4 @@
-// C6mac Sky Warden — White-Label Branding System
+// SkyWarden — White-Label Branding System
 
 export interface BrandPreset {
   id: string;
