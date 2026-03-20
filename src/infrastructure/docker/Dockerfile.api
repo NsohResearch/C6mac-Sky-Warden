@@ -1,0 +1,50 @@
+# ═══════════════════════════════════════════════════
+# C6macEye API — Production Dockerfile
+# Multi-stage build for minimal attack surface
+# ═══════════════════════════════════════════════════
+
+# Stage 1: Dependencies
+FROM node:22-alpine AS deps
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+COPY src/api/package.json src/api/
+COPY src/shared/package.json src/shared/
+
+RUN npm ci --production=false
+
+# Stage 2: Build
+FROM node:22-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN npm run build --workspace=@c6maceye/api
+
+# Stage 3: Production
+FROM node:22-alpine AS runner
+WORKDIR /app
+
+# Security: run as non-root
+RUN addgroup --system --gid 1001 c6maceye && \
+    adduser --system --uid 1001 c6maceye
+
+# Copy only production files
+COPY --from=builder /app/src/api/dist ./dist
+COPY --from=builder /app/src/api/package.json ./
+COPY --from=deps /app/node_modules ./node_modules
+
+# Remove dev dependencies
+RUN npm prune --production
+
+USER c6maceye
+
+ENV NODE_ENV=production
+ENV PORT=3001
+EXPOSE 3001
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
+
+CMD ["node", "dist/index.js"]

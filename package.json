@@ -1,0 +1,32 @@
+{
+  "name": "c6maceye",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UAV/Drone Fleet & Airspace Management SaaS Platform",
+  "workspaces": [
+    "src/api",
+    "src/web",
+    "src/shared",
+    "src/mobile"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "db:migrate": "cd src/api && npm run db:migrate",
+    "db:seed": "cd src/api && npm run db:seed",
+    "db:reset": "cd src/api && npm run db:reset",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "npm@10.9.0"
+}
