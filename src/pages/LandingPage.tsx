@@ -236,6 +236,41 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* COMMUNITY */}
+      <section className="border-t border-border/40 px-4 py-20 lg:py-28">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
+            <Globe2 className="h-7 w-7 text-accent" />
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight">Join the C6mac Community</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground text-pretty">
+            Connect with drone operators, agencies, and developers across {Object.keys(REGION_CONFIGS).length} countries. Share flight data, collaborate on airspace safety, and help shape the future of UAV operations in your region.
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-border/50 bg-card p-6">
+              <p className="text-2xl font-bold text-accent">12</p>
+              <p className="mt-1 text-sm text-muted-foreground">Countries Supported</p>
+            </div>
+            <div className="rounded-xl border border-border/50 bg-card p-6">
+              <p className="text-2xl font-bold text-accent">24</p>
+              <p className="mt-1 text-sm text-muted-foreground">Industry Verticals</p>
+            </div>
+            <div className="rounded-xl border border-border/50 bg-card p-6">
+              <p className="text-2xl font-bold text-accent">5</p>
+              <p className="mt-1 text-sm text-muted-foreground">Subscription Tiers</p>
+            </div>
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 active:scale-[0.97] transition-all" onClick={() => navigate('/login')}>
+              Join Sky Warden <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/pricing')}>
+              View Pricing
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-t border-border/40 bg-primary px-4 py-16">
         <div className="mx-auto max-w-3xl text-center">
@@ -249,12 +284,44 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer className="border-t border-border/40 bg-card px-4 py-12">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Plane className="h-5 w-5 text-accent" />
-            <span className="text-sm font-semibold">C6mac Sky Warden</span>
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Plane className="h-5 w-5 text-accent" />
+                <span className="text-sm font-semibold">C6mac Sky Warden</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">UAV airspace management platform for the drone economy. Trusted across North America and Africa.</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Platform</p>
+              <div className="space-y-2 text-sm">
+                <a href="#features" className="block text-muted-foreground hover:text-foreground transition-colors">Features</a>
+                <a href="/pricing" className="block text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
+                <a href="#industries" className="block text-muted-foreground hover:text-foreground transition-colors">Industries</a>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Compliance</p>
+              <div className="space-y-2 text-sm">
+                <span className="block text-muted-foreground">FAA LAANC</span>
+                <span className="block text-muted-foreground">Remote ID (Part 89)</span>
+                <span className="block text-muted-foreground">Transport Canada</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Legal</p>
+              <div className="space-y-2 text-sm">
+                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Terms of Service</a>
+                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</a>
+                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Cookie Policy</a>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} C6mac Research. All rights reserved.</p>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/40 pt-6">
+            <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} C6mac Research. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">Built for pilots, by pilots.</p>
+          </div>
         </div>
       </footer>
     </div>
