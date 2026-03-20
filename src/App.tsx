@@ -7,15 +7,18 @@ import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import DashboardLayout from "@/components/DashboardLayout";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
+import LandingPage from "@/pages/LandingPage";
+import Onboarding from "@/pages/Onboarding";
 import Dashboard from "@/pages/Dashboard";
 import Airspace from "@/pages/Airspace";
 import Fleet from "@/pages/Fleet";
 import Missions from "@/pages/Missions";
+import FlightPlans from "@/pages/FlightPlans";
 import LaancAuth from "@/pages/LaancAuth";
 import RemoteId from "@/pages/RemoteId";
 import Analytics from "@/pages/Analytics";
 import SettingsPage from "@/pages/SettingsPage";
+import WhiteLabelSettings from "@/pages/WhiteLabelSettings";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -35,18 +38,21 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Navigate to="/login" replace />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/airspace" element={<Airspace />} />
               <Route path="/fleet" element={<Fleet />} />
               <Route path="/missions" element={<Missions />} />
+              <Route path="/flight-plans" element={<FlightPlans />} />
               <Route path="/laanc" element={<LaancAuth />} />
               <Route path="/remote-id" element={<RemoteId />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/white-label" element={<WhiteLabelSettings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

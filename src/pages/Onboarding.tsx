@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { REGION_CONFIGS, type RegionCode } from "@/lib/region-config";
+import { ArrowRight } from "lucide-react";
 import { Check, ChevronRight, Plane, Shield, MapPin, Radio } from "lucide-react";
 
 const STEPS = [
