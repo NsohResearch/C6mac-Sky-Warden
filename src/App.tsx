@@ -53,6 +53,7 @@ const App = () => (
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/airspace" element={<Airspace />} />
+              <Route path="/live-telemetry" element={<LiveTelemetry />} />
               <Route path="/fleet" element={<Fleet />} />
               <Route path="/missions" element={<Missions />} />
               <Route path="/flight-plans" element={<FlightPlans />} />
