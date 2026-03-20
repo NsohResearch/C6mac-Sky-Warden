@@ -11,7 +11,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Bell,
+  
   Search,
   LogOut,
   User,
