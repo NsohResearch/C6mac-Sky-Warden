@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -34,30 +34,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const initializedRef = useRef(false);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
 
-    if (error) {
-      console.error("Failed to load user profile", error);
+      if (error) {
+        console.error("Failed to load user profile", error);
+        setProfile(null);
+        return null;
+      }
+
+      const nextProfile = (data as UserProfile | null) ?? null;
+      setProfile(nextProfile);
+      return nextProfile;
+    } catch (err) {
+      console.error("Profile fetch exception", err);
       setProfile(null);
       return null;
     }
-
-    const nextProfile = (data as UserProfile | null) ?? null;
-    setProfile(nextProfile);
-    return nextProfile;
   }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
-        setLoading(true);
+        // Skip if this is the initial event — getSession handles that
+        if (!initializedRef.current) return;
+
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
@@ -73,7 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // THEN check existing session
     void (async () => {
-      setLoading(true);
       const { data: { session: existingSession } } = await supabase.auth.getSession();
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
@@ -85,14 +93,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setLoading(false);
+      initializedRef.current = true;
     })();
 
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setLoading(false);
+      return { error: error as Error | null };
+    }
+    // Manually update state since we skipped onAuthStateChange during init
+    if (data.session) {
+      setSession(data.session);
+      setUser(data.session.user);
+      await fetchProfile(data.session.user.id);
+    }
+    setLoading(false);
+    return { error: null };
   };
 
   const signUp = async (email: string, password: string, metadata: Record<string, string>) => {
@@ -110,6 +131,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(null);
+    setUser(null);
+    setSession(null);
   };
 
   return (
