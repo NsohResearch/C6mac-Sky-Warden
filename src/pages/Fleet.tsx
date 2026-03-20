@@ -47,7 +47,7 @@ export default function Fleet() {
   const addDrone = useMutation({
     mutationFn: async () => {
       if (!profile?.tenant_id) throw new Error("No tenant");
-      const { error } = await supabase.from("drones").insert({
+      const { error } = await supabase.from("drones").insert([{
         tenant_id: profile.tenant_id,
         manufacturer: form.manufacturer,
         model: form.model,
