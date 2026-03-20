@@ -23,7 +23,7 @@ export default function WhiteLabelSettings() {
   const handleReset = () => {
     resetBrand();
     setActivePreset('sky-warden');
-    toast({ title: 'Theme reset', description: 'Default Sky Warden theme restored.' });
+    toast({ title: 'Theme reset', description: 'Default SkyWarden theme restored.' });
   };
 
   return (

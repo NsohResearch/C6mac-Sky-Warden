@@ -1,4 +1,4 @@
-// C6mac Sky Warden — 24 Industry Verticals
+// SkyWarden — 24 Industry Verticals
 export interface Industry {
   id: string;
   name: string;

@@ -60,10 +60,10 @@ export default function DashboardLayout() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0">
-          <img src={logoMark} alt="C6mac Sky Warden" className="w-8 h-8 shrink-0" />
+          <img src={logoMark} alt="SkyWarden" className="w-8 h-8 shrink-0" />
           {!collapsed && (
             <span className="font-semibold text-sidebar-accent-foreground tracking-tight text-[15px] animate-fade-in">
-              Sky Warden
+              SkyWarden
             </span>
           )}
         </div>

@@ -1,4 +1,4 @@
-// C6mac Sky Warden — Multi-Region Configuration
+// SkyWarden — Multi-Region Configuration
 // Supports 12 countries across USA, Canada, and Africa
 
 export type RegionCode = 'US' | 'CA' | 'NG' | 'KE' | 'ZA' | 'GH' | 'RW' | 'TZ' | 'ET' | 'SN' | 'CI' | 'UG';

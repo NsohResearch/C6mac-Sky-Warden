@@ -140,7 +140,7 @@ export default function Onboarding() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
                 <Plane className="h-8 w-8 text-accent" />
               </div>
-              <CardTitle className="text-2xl">Welcome to Sky Warden</CardTitle>
+              <CardTitle className="text-2xl">Welcome to SkyWarden</CardTitle>
               <p className="mt-2 text-sm text-muted-foreground">
                 Before you can plan flights, you need to register at least one drone. This ensures compliance with {regionConfig.authorityAcronym} regulations.
               </p>
