@@ -216,11 +216,44 @@ export default function FlightPlans() {
               </Button>
               <Button variant="outline" size="icon" onClick={() => {
                 setPlanName('');
+                setLastMissionId(null);
+                setLastDecision(null);
                 setWaypoints([{ id: crypto.randomUUID(), name: 'Launch', lat: '', lng: '', altitude_ft: 0, speed_kts: 0, action: 'flyover' }]);
               }}>
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
+            {lastMissionId && (
+              <Button
+                className="w-full"
+                variant={lastDecision ? 'outline' : 'default'}
+                onClick={handleSubmitForApproval}
+                disabled={submitting}
+              >
+                <Shield className="mr-1 h-4 w-4" />
+                {submitting ? 'Evaluating policy…' : lastDecision ? 'Resubmit for approval' : 'Submit for approval'}
+              </Button>
+            )}
+            {lastDecision && (
+              <div className={`rounded-lg border p-3 text-xs space-y-1 ${
+                lastDecision.decision === 'approved' ? 'border-success/40 bg-success/5' :
+                lastDecision.decision === 'denied' ? 'border-destructive/40 bg-destructive/5' :
+                'border-warning/40 bg-warning/5'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold capitalize">{lastDecision.decision}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">{lastDecision.reference}</span>
+                </div>
+                {lastDecision.nearest_zone && (
+                  <p className="text-muted-foreground">Nearest airspace: {lastDecision.nearest_zone}</p>
+                )}
+                {lastDecision.reasons?.map((r, i) => <p key={i} className="text-muted-foreground">• {r}</p>)}
+                {lastDecision.conditions?.map((c, i) => <p key={i} className="text-muted-foreground">✓ {c}</p>)}
+                {lastDecision.decision === 'escalated' && (
+                  <p className="pt-1 text-warning">A reviewer has been notified. Track in LAANC →</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
