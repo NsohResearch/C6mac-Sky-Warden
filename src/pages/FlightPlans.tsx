@@ -46,6 +46,46 @@ export default function FlightPlans() {
   const [submitting, setSubmitting] = useState(false);
   const [lastMissionId, setLastMissionId] = useState<string | null>(null);
   const [lastDecision, setLastDecision] = useState<null | { decision: string; reference: string; reasons: string[]; conditions: string[]; nearest_zone: string | null }>(null);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [mapDraft, setMapDraft] = useState<DrawableShape[]>([]);
+
+  const { data: geofenceOverlays = [] } = useQuery({
+    queryKey: ["geofences-overlay"],
+    queryFn: async () => {
+      const { data } = await supabase.from("geofences").select("id, name, type, enforcement, geometry").eq("status", "active");
+      return (data ?? []).map((g) => ({
+        type: "polygon" as const,
+        geojson: g.geometry,
+        color: g.type === "no_fly" || g.type === "emergency" ? "#EF4444" : g.type === "advisory" ? "#F59E0B" : "#3B82F6",
+        fillOpacity: g.enforcement === "hard" ? 0.35 : 0.15,
+        label: g.name,
+      }));
+    },
+  });
+
+  const applyMapPoints = () => {
+    const lineShape = mapDraft.find((s) => s.kind === "polyline");
+    const markers = mapDraft.filter((s) => s.kind === "marker");
+    let pts: Array<{ lat: number; lng: number }> = [];
+    if (lineShape && lineShape.kind === "polyline") pts = lineShape.points;
+    else if (markers.length) pts = markers.map((m: any) => ({ lat: m.lat, lng: m.lng }));
+    if (pts.length === 0) {
+      toast({ title: "No route drawn", description: "Draw a polyline or drop markers to set waypoints.", variant: "destructive" });
+      return;
+    }
+    setWaypoints(pts.map((p, i) => ({
+      id: crypto.randomUUID(),
+      name: i === 0 ? "Launch" : `WP${i}`,
+      lat: p.lat.toFixed(6),
+      lng: p.lng.toFixed(6),
+      altitude_ft: i === 0 ? 0 : maxAltitude,
+      speed_kts: i === 0 ? 0 : 15,
+      action: "flyover" as const,
+    })));
+    setMapOpen(false);
+    setMapDraft([]);
+    toast({ title: `${pts.length} waypoints set from map` });
+  };
 
   const { data: drones } = useQuery({
     queryKey: ['drones-for-plan'],
