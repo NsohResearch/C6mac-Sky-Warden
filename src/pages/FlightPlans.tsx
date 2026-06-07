@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { REGION_CONFIGS, type RegionCode } from "@/lib/region-config";
-import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw, Shield } from "lucide-react";
+import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw, Shield, Pencil } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PlaceSearch from "@/components/PlaceSearch";
+import DrawableMap, { type DrawableShape } from "@/components/DrawableMap";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Waypoint {
   id: string;
@@ -44,6 +46,46 @@ export default function FlightPlans() {
   const [submitting, setSubmitting] = useState(false);
   const [lastMissionId, setLastMissionId] = useState<string | null>(null);
   const [lastDecision, setLastDecision] = useState<null | { decision: string; reference: string; reasons: string[]; conditions: string[]; nearest_zone: string | null }>(null);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [mapDraft, setMapDraft] = useState<DrawableShape[]>([]);
+
+  const { data: geofenceOverlays = [] } = useQuery({
+    queryKey: ["geofences-overlay"],
+    queryFn: async () => {
+      const { data } = await supabase.from("geofences").select("id, name, type, enforcement, geometry").eq("status", "active");
+      return (data ?? []).map((g) => ({
+        type: "polygon" as const,
+        geojson: g.geometry,
+        color: g.type === "no_fly" || g.type === "emergency" ? "#EF4444" : g.type === "advisory" ? "#F59E0B" : "#3B82F6",
+        fillOpacity: g.enforcement === "hard" ? 0.35 : 0.15,
+        label: g.name,
+      }));
+    },
+  });
+
+  const applyMapPoints = () => {
+    const lineShape = mapDraft.find((s) => s.kind === "polyline");
+    const markers = mapDraft.filter((s) => s.kind === "marker");
+    let pts: Array<{ lat: number; lng: number }> = [];
+    if (lineShape && lineShape.kind === "polyline") pts = lineShape.points;
+    else if (markers.length) pts = markers.map((m: any) => ({ lat: m.lat, lng: m.lng }));
+    if (pts.length === 0) {
+      toast({ title: "No route drawn", description: "Draw a polyline or drop markers to set waypoints.", variant: "destructive" });
+      return;
+    }
+    setWaypoints(pts.map((p, i) => ({
+      id: crypto.randomUUID(),
+      name: i === 0 ? "Launch" : `WP${i}`,
+      lat: p.lat.toFixed(6),
+      lng: p.lng.toFixed(6),
+      altitude_ft: i === 0 ? 0 : maxAltitude,
+      speed_kts: i === 0 ? 0 : 15,
+      action: "flyover" as const,
+    })));
+    setMapOpen(false);
+    setMapDraft([]);
+    toast({ title: `${pts.length} waypoints set from map` });
+  };
 
   const { data: drones } = useQuery({
     queryKey: ['drones-for-plan'],
@@ -264,9 +306,14 @@ export default function FlightPlans() {
               <CardTitle className="flex items-center gap-2 text-base">
                 <MapPin className="h-4 w-4 text-accent" /> Waypoints ({waypoints.length})
               </CardTitle>
-              <Button size="sm" variant="outline" onClick={addWaypoint}>
-                <Plus className="mr-1 h-3.5 w-3.5" /> Add Waypoint
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" variant="default" onClick={() => setMapOpen(true)}>
+                  <Pencil className="mr-1 h-3.5 w-3.5" /> Draw on Map
+                </Button>
+                <Button size="sm" variant="outline" onClick={addWaypoint}>
+                  <Plus className="mr-1 h-3.5 w-3.5" /> Add Waypoint
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -362,6 +409,33 @@ export default function FlightPlans() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={mapOpen} onOpenChange={setMapOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4" /> Draw Your Flight Route
+            </DialogTitle>
+          </DialogHeader>
+          <DrawableMap
+            height="540px"
+            tools={["polyline", "marker"]}
+            overlays={geofenceOverlays}
+            onChange={setMapDraft}
+          />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
+            <p className="text-xs text-muted-foreground">
+              Draw a polyline for a continuous route, or drop markers one-by-one. Active geofences are shown for reference. Existing waypoints will be replaced.
+            </p>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="outline" onClick={() => setMapOpen(false)}>Cancel</Button>
+              <Button onClick={applyMapPoints} disabled={mapDraft.length === 0}>
+                Use these waypoints
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
