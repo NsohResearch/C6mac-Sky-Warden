@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Clock, CheckCircle2, XCircle, ArrowRight, FileText } from "lucide-react";
+import { Shield, Clock, CheckCircle2, XCircle, ArrowRight, FileText, AlertTriangle } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
+import { toast } from "sonner";
 
 export default function LaancAuth() {
+  const queryClient = useQueryClient();
   const { data: authorizations = [], isLoading } = useQuery({
     queryKey: ["laanc-authorizations"],
     queryFn: async () => {
@@ -16,6 +18,30 @@ export default function LaancAuth() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const decide = useMutation({
+    mutationFn: async ({ id, decision }: { id: string; decision: "approved" | "denied" }) => {
+      const { error } = await supabase
+        .from("flight_authorizations")
+        .update({
+          status: decision,
+          decided_at: new Date().toISOString(),
+          reviewed_by: "human-reviewer",
+        })
+        .eq("id", id);
+      if (error) throw error;
+      // Mirror to mission
+      const { data: auth } = await supabase.from("flight_authorizations").select("operation_area, tenant_id").eq("id", id).maybeSingle();
+      if (auth) {
+        await supabase.from("missions").update({ authorization_status: decision }).eq("laanc_authorization_id", id);
+      }
+    },
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["laanc-authorizations"] });
+      toast.success(vars.decision === "approved" ? "Authorization approved" : "Authorization denied");
+    },
+    onError: (e: any) => toast.error(e.message),
   });
 
   const approvedCount = authorizations.filter((a) => a.status === "approved").length;
