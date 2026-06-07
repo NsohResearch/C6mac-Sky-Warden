@@ -89,7 +89,7 @@ export default function GeofencePage() {
         enforcement: form.enforcement,
         alt_min_ft: form.alt_min_ft,
         alt_max_ft: form.alt_max_ft,
-        geometry,
+        geometry: geometry as any,
         area_sq_meters,
         source: "User Created",
       }]);
