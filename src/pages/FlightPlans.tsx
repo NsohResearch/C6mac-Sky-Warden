@@ -340,7 +340,8 @@ export default function FlightPlans() {
                     <Label className="text-[10px]">Find location</Label>
                     <PlaceSearch
                       size="sm"
-                      placeholder="Search city, town, or landmark…"
+                      countryCodes="cm,td,ga,cf,gq,cg"
+                      placeholder="Search a CEMAC city, town, or landmark…"
                       onSelect={(p) => {
                         updateWaypoint(wp.id, 'lat', p.lat.toFixed(6));
                         updateWaypoint(wp.id, 'lng', p.lng.toFixed(6));

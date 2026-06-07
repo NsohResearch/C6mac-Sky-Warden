@@ -51,8 +51,16 @@ export default function LaancAuth() {
   return (
     <div className="p-6 max-w-[1400px] mx-auto space-y-6">
       <div className="animate-reveal-up">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">LAANC Authorization</h1>
-        <p className="text-sm text-muted-foreground mt-1">Low Altitude Authorization and Notification Capability</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Airspace Authorization</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          CEMAC airspace coordination — CCAA (Cameroon), ADAC (Chad), ANAC-CF, ANAC-CG, DGAC-GQ, ANAC-GA
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 text-xs text-foreground/90">
+        <strong className="text-warning">Advisory only.</strong> SkyWarden is not yet an official LAANC/USS partner. Authorizations
+        generated here are policy advisories based on published CEMAC airspace data and must still be confirmed with the
+        relevant national civil aviation authority before flight. Decisions are logged for your records.
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -68,9 +76,9 @@ export default function LaancAuth() {
         <div className="flex items-center gap-3 overflow-x-auto pb-2">
           {[
             { label: "Request", desc: "Submit area & altitude" },
-            { label: "UASFM Check", desc: "Grid ceiling validation" },
-            { label: "Auto-Approve", desc: "At/below max altitude" },
-            { label: "Active", desc: "Authorization valid" },
+            { label: "Airspace Check", desc: "CEMAC CTR proximity & ceiling" },
+            { label: "Auto-Decision", desc: "Approve, escalate, or deny" },
+            { label: "Authority Sign-off", desc: "National CAA confirmation" },
           ].map((step, i) => (
             <div key={i} className="flex items-center gap-3 shrink-0">
               <div className="bg-muted rounded-lg px-4 py-3 min-w-[140px]">

@@ -142,7 +142,8 @@ export default function Weather() {
         <div>
           <label className="block text-xs font-semibold text-foreground mb-1">Search by place</label>
           <PlaceSearch
-            placeholder="Try a city, airport, or landmark — e.g. Douala, Addis Ababa, KLAX"
+            countryCodes="cm,td,ga,cf,gq,cg"
+            placeholder="Try a CEMAC city or airport — e.g. Douala, Libreville, N'Djamena, Brazzaville"
             onSelect={(p) => {
               setLat(p.lat.toFixed(6));
               setLng(p.lng.toFixed(6));
