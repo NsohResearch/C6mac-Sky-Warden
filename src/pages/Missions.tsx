@@ -73,6 +73,23 @@ export default function Missions() {
     onError: (e) => toast.error(e.message),
   });
 
+  const submitAuthorization = useMutation({
+    mutationFn: async (missionId: string) => {
+      const { data, error } = await supabase.functions.invoke('submit-authorization', { body: { mission_id: missionId } });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['missions-list'] });
+      const label = data.decision === 'approved' ? 'Auto-approved' : data.decision === 'denied' ? 'Auto-rejected' : 'Escalated for review';
+      toast[data.decision === 'denied' ? 'error' : 'success'](
+        `${label} · ${data.reference}`,
+        { description: data.reasons?.[0] ?? (data.conditions?.[0] ?? 'Decision recorded.') }
+      );
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const activeCount = missions.filter((m) => m.status === "active" || m.status === "in_progress").length;
   const pendingCount = missions.filter((m) => m.status === "draft" || m.status === "pending").length;
 
