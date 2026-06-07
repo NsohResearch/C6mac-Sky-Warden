@@ -3184,6 +3184,19 @@ export type Database = {
         }
         Returns: string
       }
+      verify_drone_registration: {
+        Args: { _code: string }
+        Returns: {
+          digital_drone_id: string
+          expires_at: string
+          issued_at: string
+          manufacturer: string
+          model: string
+          region: Database["public"]["Enums"]["region_code"]
+          registration_type: Database["public"]["Enums"]["registration_type"]
+          status: Database["public"]["Enums"]["registration_status"]
+        }[]
+      }
     }
     Enums: {
       b4ufly_advisory_level: "green" | "yellow" | "red"

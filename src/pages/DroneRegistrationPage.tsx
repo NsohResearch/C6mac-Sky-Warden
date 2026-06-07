@@ -109,12 +109,9 @@ export default function DroneRegistrationPage() {
   });
 
   const doVerify = async () => {
-    const code = verifyCode.trim().toUpperCase();
-    const { data } = await supabase.from('drone_registrations').select('id, status, digital_drone_id')
-      .or(`digital_drone_id.eq.${code},verification_code.eq.${code}`)
-      .eq('publicly_verifiable', true)
-      .maybeSingle();
-    setVerifyResult(data ? 'valid' : 'invalid');
+    const code = verifyCode.trim();
+    const { data } = await supabase.rpc('verify_drone_registration', { _code: code });
+    setVerifyResult(data && data.length > 0 ? 'valid' : 'invalid');
   };
 
   const filteredRegs = registrations.filter((r) => {
