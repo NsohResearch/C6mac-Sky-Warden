@@ -80,7 +80,7 @@ export default function GeofencePage() {
       const first = polys[0];
       const geometry = first.kind === "polygon" ? first.geojson : first.geojson;
       const area_sq_meters = (first as any).area_sq_m;
-      const { error } = await supabase.from("geofences").insert({
+      const { error } = await supabase.from("geofences").insert([{
         tenant_id: profile.tenant_id,
         created_by: profile.id,
         region: profile.region as any,
@@ -92,7 +92,7 @@ export default function GeofencePage() {
         geometry,
         area_sq_meters,
         source: "User Created",
-      });
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {
