@@ -122,17 +122,18 @@ export default function Missions() {
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Alt</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Risk</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Status</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Authorization</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Created</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={7} className="px-5 py-8 text-center text-sm text-muted-foreground">Loading…</td></tr>
+                <tr><td colSpan={8} className="px-5 py-8 text-center text-sm text-muted-foreground">Loading…</td></tr>
               ) : missions.length === 0 ? (
-                <tr><td colSpan={7} className="px-5 py-8 text-center text-sm text-muted-foreground">No missions yet. Create your first mission to get started.</td></tr>
+                <tr><td colSpan={8} className="px-5 py-8 text-center text-sm text-muted-foreground">No missions yet. Create your first mission to get started.</td></tr>
               ) : missions.map((m) => (
-                <tr key={m.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer group">
+                <tr key={m.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors group">
                   <td className="px-5 py-3.5">
                     <div className="text-sm font-medium text-foreground">{m.title}</div>
                     <div className="text-xs text-muted-foreground mono mt-0.5">{m.id.slice(0, 8)}</div>
@@ -144,6 +145,21 @@ export default function Missions() {
                     <StatusBadge status={statusMap[m.status] ?? "neutral"}>
                       {m.status.charAt(0).toUpperCase() + m.status.slice(1).replace(/_/g, " ")}
                     </StatusBadge>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    {m.authorization_status ? (
+                      <StatusBadge status={statusMap[m.authorization_status] ?? (m.authorization_status === 'approved' ? 'approved' : m.authorization_status === 'denied' ? 'denied' : 'pending')}>
+                        {m.authorization_status.charAt(0).toUpperCase() + m.authorization_status.slice(1)}
+                      </StatusBadge>
+                    ) : (
+                      <button
+                        onClick={() => submitAuthorization.mutate(m.id)}
+                        disabled={submitAuthorization.isPending}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50"
+                      >
+                        <Shield className="w-3 h-3" /> Submit
+                      </button>
+                    )}
                   </td>
                   <td className="px-5 py-3.5 text-xs text-muted-foreground">{new Date(m.created_at).toLocaleDateString()}</td>
                   <td className="px-3 py-3.5">
