@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { REGION_CONFIGS, type RegionCode } from "@/lib/region-config";
-import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw } from "lucide-react";
+import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PlaceSearch from "@/components/PlaceSearch";
 
@@ -41,6 +41,9 @@ export default function FlightPlans() {
     { id: crypto.randomUUID(), name: 'Launch', lat: '', lng: '', altitude_ft: 0, speed_kts: 0, action: 'flyover' },
   ]);
   const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [lastMissionId, setLastMissionId] = useState<string | null>(null);
+  const [lastDecision, setLastDecision] = useState<null | { decision: string; reference: string; reasons: string[]; conditions: string[]; nearest_zone: string | null }>(null);
 
   const { data: drones } = useQuery({
     queryKey: ['drones-for-plan'],
@@ -102,15 +105,43 @@ export default function FlightPlans() {
           estimated_duration: estimatedDuration,
         },
       };
-      const { error } = await supabase.from('missions').insert(insertData as any);
+      const { data: inserted, error } = await supabase.from('missions').insert(insertData as any).select('id').single();
       if (error) throw error;
+      setLastMissionId(inserted.id);
+      setLastDecision(null);
       toast({ title: 'Flight plan saved', description: `"${planName}" created as draft mission.` });
-      setPlanName('');
-      setWaypoints([{ id: crypto.randomUUID(), name: 'Launch', lat: '', lng: '', altitude_ft: 0, speed_kts: 0, action: 'flyover' }]);
     } catch (err: any) {
       toast({ title: 'Failed to save', description: err.message, variant: 'destructive' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSubmitForApproval = async () => {
+    if (!lastMissionId) return;
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('submit-authorization', {
+        body: { mission_id: lastMissionId },
+      });
+      if (error) throw error;
+      setLastDecision(data);
+      const titleMap: Record<string, string> = {
+        approved: 'Auto-approved',
+        denied: 'Auto-rejected',
+        escalated: 'Escalated for human review',
+      };
+      toast({
+        title: titleMap[data.decision] ?? 'Submitted',
+        description: data.decision === 'approved'
+          ? `${data.reference} • cleared to fly`
+          : (data.reasons?.[0] ?? 'See LAANC page for details.'),
+        variant: data.decision === 'denied' ? 'destructive' : 'default',
+      });
+    } catch (err: any) {
+      toast({ title: 'Submission failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -185,11 +216,44 @@ export default function FlightPlans() {
               </Button>
               <Button variant="outline" size="icon" onClick={() => {
                 setPlanName('');
+                setLastMissionId(null);
+                setLastDecision(null);
                 setWaypoints([{ id: crypto.randomUUID(), name: 'Launch', lat: '', lng: '', altitude_ft: 0, speed_kts: 0, action: 'flyover' }]);
               }}>
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
+            {lastMissionId && (
+              <Button
+                className="w-full"
+                variant={lastDecision ? 'outline' : 'default'}
+                onClick={handleSubmitForApproval}
+                disabled={submitting}
+              >
+                <Shield className="mr-1 h-4 w-4" />
+                {submitting ? 'Evaluating policy…' : lastDecision ? 'Resubmit for approval' : 'Submit for approval'}
+              </Button>
+            )}
+            {lastDecision && (
+              <div className={`rounded-lg border p-3 text-xs space-y-1 ${
+                lastDecision.decision === 'approved' ? 'border-success/40 bg-success/5' :
+                lastDecision.decision === 'denied' ? 'border-destructive/40 bg-destructive/5' :
+                'border-warning/40 bg-warning/5'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold capitalize">{lastDecision.decision}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">{lastDecision.reference}</span>
+                </div>
+                {lastDecision.nearest_zone && (
+                  <p className="text-muted-foreground">Nearest airspace: {lastDecision.nearest_zone}</p>
+                )}
+                {lastDecision.reasons?.map((r, i) => <p key={i} className="text-muted-foreground">• {r}</p>)}
+                {lastDecision.conditions?.map((c, i) => <p key={i} className="text-muted-foreground">✓ {c}</p>)}
+                {lastDecision.decision === 'escalated' && (
+                  <p className="pt-1 text-warning">A reviewer has been notified. Track in LAANC →</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
