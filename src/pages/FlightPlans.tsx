@@ -409,6 +409,33 @@ export default function FlightPlans() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={mapOpen} onOpenChange={setMapOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4" /> Draw Your Flight Route
+            </DialogTitle>
+          </DialogHeader>
+          <DrawableMap
+            height="540px"
+            tools={["polyline", "marker"]}
+            overlays={geofenceOverlays}
+            onChange={setMapDraft}
+          />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
+            <p className="text-xs text-muted-foreground">
+              Draw a polyline for a continuous route, or drop markers one-by-one. Active geofences are shown for reference. Existing waypoints will be replaced.
+            </p>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="outline" onClick={() => setMapOpen(false)}>Cancel</Button>
+              <Button onClick={applyMapPoints} disabled={mapDraft.length === 0}>
+                Use these waypoints
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
