@@ -727,6 +727,137 @@ export type Database = {
           },
         ]
       }
+      geofence_breaches: {
+        Row: {
+          altitude_ft: number | null
+          breach_type: string
+          created_at: string
+          drone_id: string | null
+          geofence_id: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          mission_id: string | null
+          notes: string | null
+          resolved: boolean
+          resolved_at: string | null
+          severity: string
+          tenant_id: string
+        }
+        Insert: {
+          altitude_ft?: number | null
+          breach_type?: string
+          created_at?: string
+          drone_id?: string | null
+          geofence_id: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          mission_id?: string | null
+          notes?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          tenant_id: string
+        }
+        Update: {
+          altitude_ft?: number | null
+          breach_type?: string
+          created_at?: string
+          drone_id?: string | null
+          geofence_id?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          mission_id?: string | null
+          notes?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_breaches_geofence_id_fkey"
+            columns: ["geofence_id"]
+            isOneToOne: false
+            referencedRelation: "geofences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofences: {
+        Row: {
+          alt_max_ft: number
+          alt_min_ft: number
+          area_sq_meters: number | null
+          breach_count: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          effective_from: string | null
+          enforcement: Database["public"]["Enums"]["geofence_enforcement"]
+          expires_at: string | null
+          geometry: Json
+          id: string
+          metadata: Json
+          name: string
+          region: Database["public"]["Enums"]["region_code"]
+          source: string
+          source_reference: string | null
+          status: Database["public"]["Enums"]["geofence_status"]
+          tenant_id: string
+          type: Database["public"]["Enums"]["geofence_type"]
+          updated_at: string
+        }
+        Insert: {
+          alt_max_ft?: number
+          alt_min_ft?: number
+          area_sq_meters?: number | null
+          breach_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          effective_from?: string | null
+          enforcement?: Database["public"]["Enums"]["geofence_enforcement"]
+          expires_at?: string | null
+          geometry: Json
+          id?: string
+          metadata?: Json
+          name: string
+          region?: Database["public"]["Enums"]["region_code"]
+          source?: string
+          source_reference?: string | null
+          status?: Database["public"]["Enums"]["geofence_status"]
+          tenant_id: string
+          type?: Database["public"]["Enums"]["geofence_type"]
+          updated_at?: string
+        }
+        Update: {
+          alt_max_ft?: number
+          alt_min_ft?: number
+          area_sq_meters?: number | null
+          breach_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          effective_from?: string | null
+          enforcement?: Database["public"]["Enums"]["geofence_enforcement"]
+          expires_at?: string | null
+          geometry?: Json
+          id?: string
+          metadata?: Json
+          name?: string
+          region?: Database["public"]["Enums"]["region_code"]
+          source?: string
+          source_reference?: string | null
+          status?: Database["public"]["Enums"]["geofence_status"]
+          tenant_id?: string
+          type?: Database["public"]["Enums"]["geofence_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       government_disbursements: {
         Row: {
           completed_at: string | null
@@ -2079,6 +2210,14 @@ export type Database = {
       billing_cycle: "monthly" | "annual"
       disbursement_method: "wire_transfer" | "ach" | "eft" | "mobile_money"
       disbursement_status: "pending" | "processing" | "completed" | "failed"
+      geofence_enforcement: "hard" | "soft"
+      geofence_status: "active" | "inactive" | "expired" | "pending"
+      geofence_type:
+        | "no_fly"
+        | "operational_boundary"
+        | "advisory"
+        | "temporary_restriction"
+        | "emergency"
       gov_revenue_category:
         | "registration"
         | "authorization"
@@ -2332,6 +2471,15 @@ export const Constants = {
       billing_cycle: ["monthly", "annual"],
       disbursement_method: ["wire_transfer", "ach", "eft", "mobile_money"],
       disbursement_status: ["pending", "processing", "completed", "failed"],
+      geofence_enforcement: ["hard", "soft"],
+      geofence_status: ["active", "inactive", "expired", "pending"],
+      geofence_type: [
+        "no_fly",
+        "operational_boundary",
+        "advisory",
+        "temporary_restriction",
+        "emergency",
+      ],
       gov_revenue_category: [
         "registration",
         "authorization",
