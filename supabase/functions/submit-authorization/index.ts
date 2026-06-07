@@ -153,13 +153,15 @@ Deno.serve(async (req) => {
           reasons.push(`${nearestZone.name} is controlled airspace — manual review required.`);
         }
       }
-      // If no controlled zone within 10 NM, treat as Class G uncontrolled → auto-approve up to 400 ft.
+      // If no controlled zone within 10 NM, treat as uncontrolled airspace → auto-approve up to 400 ft.
       if (!nearestZone) {
+        const isCemac = ["CM","TD","GA","CF","GQ","CG"].includes(String(mission.region));
+        const ruleLabel = isCemac ? "CEMAC national CAA limits (400 ft AGL, VLOS, daylight)" : "Part 107 limits";
         if (altitude > 400) {
           policyDecision = "escalated";
-          reasons.push(`Requested ${altitude} ft exceeds 400 ft Part 107 default ceiling in uncontrolled airspace.`);
+          reasons.push(`Requested ${altitude} ft exceeds the 400 ft default ceiling for uncontrolled airspace in ${mission.region}.`);
         } else {
-          conditions.push("Class G uncontrolled airspace — operate within Part 107 limits.");
+          conditions.push(`Uncontrolled airspace — operate within ${ruleLabel}.`);
         }
       }
     } else {
