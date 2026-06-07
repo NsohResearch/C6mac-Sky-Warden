@@ -20,6 +20,8 @@ interface Mission {
   description: string | null;
   drone_id: string | null;
   pilot_id: string | null;
+  authorization_status: string | null;
+  laanc_authorization_id: string | null;
 }
 
 function RiskIndicator({ score }: { score: number | null }) {
