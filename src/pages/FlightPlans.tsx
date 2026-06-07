@@ -105,15 +105,43 @@ export default function FlightPlans() {
           estimated_duration: estimatedDuration,
         },
       };
-      const { error } = await supabase.from('missions').insert(insertData as any);
+      const { data: inserted, error } = await supabase.from('missions').insert(insertData as any).select('id').single();
       if (error) throw error;
+      setLastMissionId(inserted.id);
+      setLastDecision(null);
       toast({ title: 'Flight plan saved', description: `"${planName}" created as draft mission.` });
-      setPlanName('');
-      setWaypoints([{ id: crypto.randomUUID(), name: 'Launch', lat: '', lng: '', altitude_ft: 0, speed_kts: 0, action: 'flyover' }]);
     } catch (err: any) {
       toast({ title: 'Failed to save', description: err.message, variant: 'destructive' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSubmitForApproval = async () => {
+    if (!lastMissionId) return;
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('submit-authorization', {
+        body: { mission_id: lastMissionId },
+      });
+      if (error) throw error;
+      setLastDecision(data);
+      const titleMap: Record<string, string> = {
+        approved: 'Auto-approved',
+        denied: 'Auto-rejected',
+        escalated: 'Escalated for human review',
+      };
+      toast({
+        title: titleMap[data.decision] ?? 'Submitted',
+        description: data.decision === 'approved'
+          ? `${data.reference} • cleared to fly`
+          : (data.reasons?.[0] ?? 'See LAANC page for details.'),
+        variant: data.decision === 'denied' ? 'destructive' : 'default',
+      });
+    } catch (err: any) {
+      toast({ title: 'Submission failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
     }
   };
 
