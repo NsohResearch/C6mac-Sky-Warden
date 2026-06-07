@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { REGION_CONFIGS, type RegionCode } from "@/lib/region-config";
-import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw } from "lucide-react";
+import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PlaceSearch from "@/components/PlaceSearch";
 
