@@ -1,0 +1,1 @@
+ALTER TYPE public.region_code ADD VALUE IF NOT EXISTS 'CM';

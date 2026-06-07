@@ -2281,6 +2281,7 @@ export type Database = {
         | "SS"
         | "AO"
         | "CD"
+        | "CM"
       registration_status:
         | "pending_payment"
         | "pending_review"
@@ -2549,6 +2550,7 @@ export const Constants = {
         "SS",
         "AO",
         "CD",
+        "CM",
       ],
       registration_status: [
         "pending_payment",
