@@ -83,6 +83,53 @@ export default function LaancAuth() {
         </div>
       </div>
 
+      {/* Escalation queue */}
+      {authorizations.some((a) => a.status === "pending") && (
+        <div className="bg-card rounded-lg shadow-card border border-warning/30">
+          <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-warning" />
+            <h2 className="text-sm font-semibold text-foreground">Escalations — Awaiting Human Review</h2>
+          </div>
+          <div className="divide-y divide-border">
+            {authorizations.filter((a) => a.status === "pending").map((auth) => (
+              <div key={auth.id} className="px-5 py-4 flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-medium">{auth.reference_code}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning/10 text-warning uppercase tracking-wide">
+                      {auth.authorization_type?.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-foreground mt-1">
+                    {auth.requested_altitude_ft} ft requested{auth.airspace_class ? ` · Class ${auth.airspace_class}` : ''}
+                    {auth.facility_id ? ` · ${auth.facility_id}` : ''}
+                  </p>
+                  {auth.denial_reason && (
+                    <p className="text-xs text-muted-foreground mt-1">{auth.denial_reason}</p>
+                  )}
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => decide.mutate({ id: auth.id, decision: "denied" })}
+                    disabled={decide.isPending}
+                    className="px-3 py-1.5 rounded text-xs font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 disabled:opacity-50"
+                  >
+                    Deny
+                  </button>
+                  <button
+                    onClick={() => decide.mutate({ id: auth.id, decision: "approved" })}
+                    disabled={decide.isPending}
+                    className="px-3 py-1.5 rounded text-xs font-medium bg-success/10 text-success hover:bg-success/20 disabled:opacity-50"
+                  >
+                    Approve
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-card rounded-lg shadow-card animate-reveal-up delay-5">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
@@ -97,14 +144,15 @@ export default function LaancAuth() {
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Airspace</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Requested / Approved</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Status</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Reviewed By</th>
                 <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3">Date</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">Loading…</td></tr>
+                <tr><td colSpan={7} className="px-5 py-8 text-center text-sm text-muted-foreground">Loading…</td></tr>
               ) : authorizations.length === 0 ? (
-                <tr><td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">No LAANC authorizations yet</td></tr>
+                <tr><td colSpan={7} className="px-5 py-8 text-center text-sm text-muted-foreground">No LAANC authorizations yet</td></tr>
               ) : authorizations.map((auth) => {
                 const statusMap: Record<string, "approved" | "pending" | "denied" | "active" | "neutral"> = {
                   approved: "approved", pending: "pending", denied: "denied", rejected: "denied", active: "active", expired: "neutral",
@@ -124,6 +172,7 @@ export default function LaancAuth() {
                         {auth.status.charAt(0).toUpperCase() + auth.status.slice(1)}
                       </StatusBadge>
                     </td>
+                    <td className="px-5 py-3 text-xs text-muted-foreground">{auth.reviewed_by ?? '—'}</td>
                     <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(auth.created_at).toLocaleDateString()}</td>
                   </tr>
                 );
