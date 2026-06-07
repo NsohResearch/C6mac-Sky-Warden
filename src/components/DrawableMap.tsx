@@ -75,7 +75,6 @@ export default function DrawableMap({
     const map = L.map(containerRef.current, {
       center,
       zoom,
-      tap: true,
       preferCanvas: true,
     });
     mapRef.current = map;
