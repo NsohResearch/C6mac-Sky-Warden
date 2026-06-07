@@ -88,7 +88,7 @@ export default function FlightPlans() {
         tenant_id: profile!.tenant_id,
         region: region,
         title: planName,
-        mission_type: flightRules === 'IFR' ? 'instrument' : 'visual',
+        mission_type: 'survey',
         status: 'draft',
         max_altitude_ft: maxAltitude,
         drone_id: selectedDrone || null,
