@@ -306,9 +306,14 @@ export default function FlightPlans() {
               <CardTitle className="flex items-center gap-2 text-base">
                 <MapPin className="h-4 w-4 text-accent" /> Waypoints ({waypoints.length})
               </CardTitle>
-              <Button size="sm" variant="outline" onClick={addWaypoint}>
-                <Plus className="mr-1 h-3.5 w-3.5" /> Add Waypoint
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" variant="default" onClick={() => setMapOpen(true)}>
+                  <Pencil className="mr-1 h-3.5 w-3.5" /> Draw on Map
+                </Button>
+                <Button size="sm" variant="outline" onClick={addWaypoint}>
+                  <Plus className="mr-1 h-3.5 w-3.5" /> Add Waypoint
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
