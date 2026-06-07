@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { REGION_CONFIGS, type RegionCode } from "@/lib/region-config";
 import { MapPin, Plus, Trash2, Navigation, Plane, Clock, ArrowUp, Save, RotateCcw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import PlaceSearch from "@/components/PlaceSearch";
 
 interface Waypoint {
   id: string;
@@ -223,6 +224,20 @@ export default function FlightPlans() {
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => removeWaypoint(wp.id)} disabled={waypoints.length <= 1}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
+                  </div>
+                  <div className="mb-2">
+                    <Label className="text-[10px]">Find location</Label>
+                    <PlaceSearch
+                      size="sm"
+                      placeholder="Search city, town, or landmark…"
+                      onSelect={(p) => {
+                        updateWaypoint(wp.id, 'lat', p.lat.toFixed(6));
+                        updateWaypoint(wp.id, 'lng', p.lng.toFixed(6));
+                        if (!wp.name || /^WP\d+$/.test(wp.name) || wp.name === 'Launch') {
+                          updateWaypoint(wp.id, 'name', p.name.split(',')[0]);
+                        }
+                      }}
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
                     <div>

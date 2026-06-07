@@ -21,6 +21,7 @@ import {
   Info,
 } from "lucide-react";
 import { format } from "date-fns";
+import PlaceSearch from "@/components/PlaceSearch";
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
@@ -137,7 +138,19 @@ export default function Weather() {
       </div>
 
       {/* Search bar */}
-      <div className="bg-card border border-border rounded-xl p-4">
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div>
+          <label className="block text-xs font-semibold text-foreground mb-1">Search by place</label>
+          <PlaceSearch
+            placeholder="Try a city, airport, or landmark — e.g. Douala, Addis Ababa, KLAX"
+            onSelect={(p) => {
+              setLat(p.lat.toFixed(6));
+              setLng(p.lng.toFixed(6));
+              checkWeather.mutate({ latitude: p.lat, longitude: p.lng, radius_nm: parseInt(radius) || 30 });
+            }}
+          />
+          <p className="mt-1 text-[10px] text-muted-foreground">Or enter coordinates manually below.</p>
+        </div>
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[140px]">
             <label className="block text-xs font-semibold text-foreground mb-1">Latitude</label>
