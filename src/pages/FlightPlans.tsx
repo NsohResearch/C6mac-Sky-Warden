@@ -41,6 +41,9 @@ export default function FlightPlans() {
     { id: crypto.randomUUID(), name: 'Launch', lat: '', lng: '', altitude_ft: 0, speed_kts: 0, action: 'flyover' },
   ]);
   const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [lastMissionId, setLastMissionId] = useState<string | null>(null);
+  const [lastDecision, setLastDecision] = useState<null | { decision: string; reference: string; reasons: string[]; conditions: string[]; nearest_zone: string | null }>(null);
 
   const { data: drones } = useQuery({
     queryKey: ['drones-for-plan'],
